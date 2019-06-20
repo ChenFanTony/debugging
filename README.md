@@ -65,7 +65,13 @@ mknod null c 1 3
     shoud enable python support
     source:
     git clone git://sourceware.org/git/binutils-gdb.git
-    then
+    then compiling it
+
+    mkdir BUILD
+    cd BUILD
+    ../configure --with-python
+    make -j8
+
     cd linux && gdb --tui vmlinux
     (gdb) target remote localhost:1234
     (gdb) hb start_kernel
