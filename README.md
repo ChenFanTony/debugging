@@ -5,6 +5,7 @@ ftrace and systemtap
 ## 2. Compiling a minimum filesystem busybox
     https://busybox.net/downloads/busybox-1.31.0.tar.bz2
    1) decompress it, similar to kernel
+   
       make menuconfig
       ---------
       Configure Busybox according the following:
