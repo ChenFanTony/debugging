@@ -14,9 +14,9 @@ ftrace and systemtap
       make CONFIG_PREFIX=`pwd`/ROOT install
    2) create dir
 
-      mkdir etc dev mnt
-      mkdir -p etc/init.d
-      cd init.d
+       mkdir etc dev mnt
+       mkdir -p etc/init.d
+       cd init.d
 
     vim rcS
    ------------
