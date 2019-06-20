@@ -26,8 +26,8 @@ ftrace and systemtap
   mount -a
   mkdir -p /dev/pts
   mount -t devpts devpts /dev/pts
-  echo /sbin/mdev > /proc/sys/kernel/hotplug
-  modev -s
+  #echo /sbin/mdev > /proc/sys/kernel/hotplug
+  mdev -s
 
 ----------------------------
 chmod +x rcS
