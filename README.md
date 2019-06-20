@@ -69,8 +69,11 @@ mknod null c 1 3
 
     mkdir BUILD
     cd BUILD
-    ../configure --with-python
+    ../configure --with-python (need install python2-devel gcc-c++
     make -j8
+
+    vim ~/.gdbinit
+    add-auto-load-safe-path /root/data/src/linux/scripts/gdb/vmlinux-gdb.py
 
     cd linux && gdb --tui vmlinux
     (gdb) target remote localhost:1234
