@@ -16,8 +16,8 @@ ftrace and systemtap
    2) create dir
 
       mkdir etc dev mnt
-     mkdir -p etc/init.d
-     cd init.d
+      mkdir -p etc/init.d
+      cd init.d
 
     vim rcS
    ------------
