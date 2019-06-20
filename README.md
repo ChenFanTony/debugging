@@ -61,7 +61,7 @@ mknod null c 1 3
 ## 4. using qemu to debug
   qemu-system-x86_64 --nographic -m 1024 -kernel linux/arch/x86_64/boot/bzImage --append "rdinit=/linuxrc console=ttyS0 loglevel=8" -S -s
 
-5. gdb
+## 5. gdb
   shoud enable python support
   source:
   git clone git://sourceware.org/git/binutils-gdb.git
@@ -71,7 +71,7 @@ then
  (gdb) hb start_kernel
  (gdb) c
 
-6. support gdb python scripts
+## 6. support gdb python scripts
 
 You need to have gdb on your system and Python debugging extensions. Extensions package includes debugging symbols and adds Python-specific
  commands into gdb. On a modern Linux system, you can easily install these with:
