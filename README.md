@@ -7,11 +7,9 @@ ftrace and systemtap
    1) decompress it, similar to kernel
    
       make menuconfig
-      ---------
       Configure Busybox according the following:
       Busybox Settings ---> Build Options ---> Build BusyBox as a static binary (no shared libs) ---> yes
       need yum install glibc-static
-      ---------
       make 
       make CONFIG_PREFIX=`pwd`/ROOT install
    2) create dir
