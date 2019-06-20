@@ -56,8 +56,9 @@ mknod null c 1 3
 
 3. compiling kernel
   1) modify initramfs source = busybox_root
-  2) save to .config
-  3) make bzImage
+  2) Enable CONFIG_GDB_SCRIPTS , disable CONFIG_RANDOMIZE_BASE
+  3) save to .config
+  4) make bzImage
 
 4. using qemu to debug
   qemu-system-x86_64 --nographic -m 1024 -kernel linux/arch/x86_64/boot/bzImage --append "rdinit=/linuxrc console=ttyS0 loglevel=8" -S -s
@@ -65,5 +66,5 @@ mknod null c 1 3
 5. gdb 
   cd linux && gdb --tui vmlinux
  (gdb) target remote localhost:1234
- (gdb) b start_kernel
+ (gdb) hb start_kernel
  (gdb) c
