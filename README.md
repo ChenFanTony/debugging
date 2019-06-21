@@ -62,8 +62,8 @@ mknod null c 1 3
   qemu-system-x86_64 --nographic -m 1024 -kernel linux/arch/x86_64/boot/bzImage --append "rdinit=/linuxrc console=ttyS0 loglevel=8" -S -s
 
 ## 5. gdb
-    shoud enable python support
-    source:
+    shoud enable python support / reference part 6:
+    by source:
     git clone git://sourceware.org/git/binutils-gdb.git
     then compiling it
 
@@ -71,6 +71,8 @@ mknod null c 1 3
     cd BUILD
     ../configure --with-python (need install python2-devel gcc-c++
     make -j8
+
+    by install: install python2-debuginfo
 
     vim ~/.gdbinit
     add-auto-load-safe-path /root/data/src/linux/scripts/gdb/vmlinux-gdb.py
