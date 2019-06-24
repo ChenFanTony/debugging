@@ -1,7 +1,7 @@
 ftrace and systemtap
 ----------------------------
 ## 1. Using qemu debug Linux core
-
+   references: https://consen.github.io/2018/01/17/debug-linux-kernel-with-qemu-and-gdb/
 ## 2. Compiling a minimum filesystem busybox
     https://busybox.net/downloads/busybox-1.31.0.tar.bz2
    1) decompress it, similar to kernel
@@ -53,13 +53,17 @@ mknod console c 5 1
 mknod null c 1 3
 
 ## 3. compiling kernel
-  1) modify initramfs source = busybox_root
+  1) modify initramfs source = busybox_root / using initramfs cpio
   2) Enable CONFIG_GDB_SCRIPTS , disable CONFIG_RANDOMIZE_BASE
   3) save to .config
   4) make bzImage
 
+  initramfs:
+     find . -print0 | cpio --null -ov --format=newc | gzip -9 > ../initramfs.cpio.gz
+
+
 ## 4. using qemu to debug
-  qemu-system-x86_64 --nographic -m 1024 -kernel linux/arch/x86_64/boot/bzImage --append "rdinit=/linuxrc console=ttyS0 loglevel=8" -S -s
+  qemu-system-x86_64 --nographic -m 1024 -kernel linux/arch/x86_64/boot/bzImage -initrd initramfs.cpio.gz -append "rdinit=/linuxrc console=ttyS0 loglevel=8" -S -s
 
 ## 5. gdb
     shoud enable python support / reference part 6:
@@ -81,6 +85,7 @@ mknod null c 1 3
     (gdb) target remote localhost:1234
     (gdb) hb start_kernel
     (gdb) c
+    (gdb) apropos lx (support lx add symbos .etc)
 
 ## 6. support gdb python scripts
 
