@@ -110,3 +110,17 @@ mknod null c 1 3
   tested on Centos 7. python-debuginfo is installable after the first two commands.
   
   For gdb support on legacy systems, look at the end of this page. 
+
+## 7. debug compiling modules
+   1) build single module
+     make modules_prepare
+     make -j4 M=drivers/virtio modules
+     mkdir /tmp/staging
+     make M=drivers/virtio INSTALL_MOD_PATH=/tmp/staging modules_install
+
+   2) build all modules (not work)
+     make modules 
+     make INSTALL_MOD_PATH=/tmp/staging modules_install
+
+   3) copy the modules to initramfs
+   cp -r /tmp/staging/* busybox_root/
