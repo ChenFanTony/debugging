@@ -1,0 +1,17 @@
+
+#! /usr/bin/ash
+
+mkdir -p /proc
+mkdir -p /run
+mkdir -p /sys
+
+# Mount the /proc and /sys filesystems.
+mount -t devtmpfs none /dev
+mount -t proc none /proc
+mount -t sysfs none /sys
+# /run directory would be moved to new root after switch_root,
+mount -t tmpfs -o rw,nosuid,nodev,mode=755 tmpfs /run
+
+mdev -s
+
+exec /bin/sh
