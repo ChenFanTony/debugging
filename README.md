@@ -75,7 +75,8 @@ mknod null c 1 3
     2) by install:
     install python-debuginfo
     vim ~/.gdbinit
-    add-auto-load-safe-path /root/data/src/linux/scripts/gdb/vmlinux-gdb.py
+    #python gdb.COMPLETE_EXPRESSION = gdb.COMPLETE_SYMBOL
+    #add-auto-load-safe-path /root/data/src/linux/scripts/gdb/vmlinux-gdb.py
 
     cd linux && gdb --tui vmlinux
     (gdb) target remote localhost:1234
