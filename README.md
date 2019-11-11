@@ -49,7 +49,7 @@ mknod null c 1 3
 
 ## 3. compiling kernel
   1) modify initramfs source = busybox_root / using initramfs cpio
-  2) Enable CONFIG_GDB_SCRIPTS , disable CONFIG_RANDOMIZE_BASE(KASLR)
+  2) Enable CONFIG_GDB_SCRIPTS , disable CONFIG_RANDOMIZE_BASE(KASLR)/or cmdline + nokaslr
   3) save to .config
   4) make bzImage
 
@@ -122,3 +122,23 @@ mknod null c 1 3
    3) copy the modules to initramfs
 
      cp -r /tmp/staging/* busybox_root/
+
+## 8. add modules support for qemu + 9p
+   1) Compile qemu with enable-virtfs:
+    ./configure --target-list=x86_64-softmmu --enable-virtfs
+
+   2) kernel enable features:
+     CONFIG_NET_9P=y
+     CONFIG_9P_FS=y
+     CONFIG_VIRTIO_PCI=y
+     CONFIG_NET_9P_VIRTIO=y
+     CONFIG_9P_FS_POSIX_ACL=y
+     CONFIG_NET_9P_DEBUG=y (Optional)
+
+   3) qemu boot args:
+     -fsdev local,security_model=passthrough,id=fsdev0,path=/tmp/share -device virtio-9p-pci,id=fs0,fsdev=fsdev0,mount_tag=hostshare /
+     -fsdev local,security_model=passthrough,id=fsdev0,path=/tmp/share,mount_tag=hostshare
+
+   4) now we can copy modules to /tmp/share and in guest mount the share directorys
+     mount -t 9p -o trans=virtio,version=9p2000.L hostshare /tmp/host_files
+
