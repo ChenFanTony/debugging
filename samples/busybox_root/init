@@ -4,6 +4,7 @@
 mkdir -p /proc
 mkdir -p /run
 mkdir -p /sys
+mkdir -p /dev
 
 # Mount the /proc and /sys filesystems.
 mount -t devtmpfs none /dev

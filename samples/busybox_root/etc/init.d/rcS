@@ -2,6 +2,7 @@ mkdir -p /proc
 mkdir -p /tmp
 mkdir -p /sys
 mkdir -p /mnt
+mkdir -p /dev
 mount -a
 mkdir -p /dev/pts
 mount -t devpts devpts /dev/pts
