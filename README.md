@@ -119,7 +119,7 @@ mknod null c 1 3
      make modules 
      make INSTALL_MOD_PATH=/tmp/staging modules_install
 
-   3) copy the modules to initramfs
+   3) we can easily copy the modules to initramfs
 
      cp -r /tmp/staging/* busybox_root/
 
@@ -142,3 +142,15 @@ mknod null c 1 3
    4) now we can copy modules to /tmp/share and in guest mount the share directorys
      mount -t 9p -o trans=virtio,version=9p2000.L hostshare /tmp/host_files
 
+## 9. create a cloud-init iso for logining in a cloud image. sometimes we need a whole OS.
+   1) generate the cloud-init iso:
+    # the default user name for different distro is centos/fedora/etc.
+    cd cloud-init
+    genisoimage -output cloud-init.iso -volid cidata -joliet -rock user-data meta-data
+
+   2) kernel enable features:
+      CONFIG_XFS_FS=y
+      CONFIG_VIRTIO_BLK=y
+
+   3) download the cloud images for centos:
+      wget http://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud-1907.qcow2.xz
