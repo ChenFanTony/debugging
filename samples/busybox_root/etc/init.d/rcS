@@ -9,6 +9,6 @@ mkdir -p /dev/pts
 mount -t devpts devpts /dev/pts
 #echo /sbin/mdev > /proc/sys/kernel/hotplug
 mdev -s
-
+#only useful for cloud image
 #mount /dev/vda1 /sysroot
 #exec switch_root /sysroot /sbin/init

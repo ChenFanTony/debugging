@@ -154,3 +154,18 @@ mknod null c 1 3
 
    3) download the cloud images for centos:
       wget http://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud-1907.qcow2.xz
+
+
+
+
+##NOTES:
+  1) the whole qemu comdline:
+    
+  ./qemu/x86_64-softmmu/qemu-system-x86_64 --nographic -m 1024 -smp 2 \
+  -kernel kernel/linux/arch/x86_64/boot/bzImage \
+  -initrd kernel/debugging/samples/initramfs.cpio.gz \
+  -append "rdinit=/linuxrc console=ttyS0 loglevel=8" \
+  -s -S -fsdev local,security_model=passthrough,id=fsdev0,path=./share \
+  -device virtio-9p-pci,id=fs0,fsdev=fsdev0,mount_tag=hostshare \
+  -drive file=/home/chenfan/images/CentOS-7-x86_64-GenericCloud-1907.qcow2,if=virtio \
+  -cdrom kernel/debugging/cloud-init/cloud-init.iso
