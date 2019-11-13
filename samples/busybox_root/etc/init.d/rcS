@@ -3,8 +3,12 @@ mkdir -p /tmp
 mkdir -p /sys
 mkdir -p /mnt
 mkdir -p /dev
+mkdir -p /sysroot
 mount -a
 mkdir -p /dev/pts
 mount -t devpts devpts /dev/pts
 #echo /sbin/mdev > /proc/sys/kernel/hotplug
 mdev -s
+
+#mount /dev/vda1 /sysroot
+#exec switch_root /sysroot /sbin/init
