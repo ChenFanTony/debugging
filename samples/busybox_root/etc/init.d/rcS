@@ -15,7 +15,7 @@ mdev -s
 
 mkdir -p /sharelib
 mount -t 9p -o trans=virtio,version=9p2000.L hostshare /sharelib/
-mount -o bind /sharelib/lib lib/
+mount -o bind /sharelib/lib /lib
 
 modprobe libcrc32c
 modprobe isofs  

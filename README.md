@@ -164,8 +164,8 @@ mknod null c 1 3
   ./qemu/x86_64-softmmu/qemu-system-x86_64 --nographic -m 1024 -smp 2 \
   -kernel kernel/linux/arch/x86_64/boot/bzImage \
   -initrd kernel/debugging/samples/initramfs.cpio.gz \
-# using linuxrc only be used to initramfs because of linuxrc call etc/init.d/rcS not a pid 1,
-# using init=init file to change cloud image
+# using rdinit=/linuxrc only can be used in initramfs because of linuxrc call etc/init.d/rcS which pid is not 1,
+# using init=/init to switch root to boot cloud image
   -append "rdinit=/linuxrc console=ttyS0 loglevel=8" \
   -s -S -fsdev local,security_model=passthrough,id=fsdev0,path=./share \
   -device virtio-9p-pci,id=fs0,fsdev=fsdev0,mount_tag=hostshare \
