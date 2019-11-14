@@ -29,3 +29,5 @@ modprobe xfs
 echo "The pid now is $$"
 #only useful for cloud image 
 mount -t xfs /dev/vda1 /sysroot
+exec switch_root /sysroot /sbin/init
+
