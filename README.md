@@ -78,6 +78,10 @@ mknod null c 1 3
     #python gdb.COMPLETE_EXPRESSION = gdb.COMPLETE_SYMBOL
     #add-auto-load-safe-path /root/data/src/linux/scripts/gdb/vmlinux-gdb.py
 
+    #for extend to support C++ std::
+    # wget https://scaron.info/files/gdbinit 
+    add `source gdbinit` to ~/.gdbinit
+
     cd linux && gdb --tui vmlinux
     (gdb) target remote localhost:1234
     (gdb) hb start_kernel
@@ -113,6 +117,9 @@ mknod null c 1 3
      make -j4 M=drivers/virtio modules
      mkdir /tmp/staging
      make M=drivers/virtio INSTALL_MOD_PATH=/tmp/staging modules_install
+
+     if we want to disable gcc optimization, add cflags in module Makefile:
+     KBUILD_CFLAGS += -Og
 
    2) build all modules (not work)
 
