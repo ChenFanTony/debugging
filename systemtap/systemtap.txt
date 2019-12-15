@@ -1,0 +1,45 @@
+systemtap
+---------
+how to use systemtap
+
+== requirement ==
+1. userspace process
+Install process debuginfo
+
+2. kernel
+Install kernel-debuginfo kernel-devel
+
+3. systemtap
+1) Install systemtap < centos7
+2) Install devtoolset < centos8 or kernel > 4.18
+   1. if host have been installed systemtap, need to remove them first.
+   $ yum remove systemtap systemtap-runtime systemtap-client systemtap-devel
+   2. add devtoolset repo
+   [sclo]
+   name=sclo
+   baseurl='http://mirror.centos.org/7/sclo/rh/'
+   enabled=1
+   gpgcheck=0
+   3. install devtoolset-8
+   $ yum install devtoolset-8
+   4. swtich to devtoolset envirement
+   $ scl enable devtoolset-8 'bash'
+
+== basic syntax ==
+1. userspace usaging
+systemtap can use inline function to show something
+  1. $$parms  <= the argments of a probe function
+  2. $$locals <= the local values
+  3. $returns <= the return values for function.return
+
+1). search a process function
+$ stap -l 'process("/usr/libexec/qemu-kvm").function("*")'
+2). search an argment of function
+$ stap -L 'process("/usr/libexec/qemu-kvm").function("worker_thread")'
+3). probe a process function
+$ stap -ve 'probe process("/usr/libexec/qemu-kvm").function("worker_thread") {print("\n"),exit()}'
+4). probe a process function return
+$ stap -ve 'probe process("/usr/libexec/qemu-kvm").function("worker_thread").return {print("\n"),exit()}'
+5). print a userspace call trace in a stp file
+$ print_usyms(ubackstrace())
+

@@ -1,0 +1,67 @@
+global begin_time
+global times
+global started
+
+probe begin
+{
+  begin_time = gettimeofday_ns()
+}
+
+probe process("/usr/libexec/qemu-kvm").function("aio_bh_call")
+{
+  printf("%d,<-- %s %s bh->cb: %p\n", gettimeofday_ns(), ppfunc(), $$parms, $bh->cb)
+}
+
+probe process("/usr/libexec/qemu-kvm").function("aio_ctx_dispatch")
+{
+  printf("%d,<-- %s %s\n", gettimeofday_ns(), ppfunc(), $$parms)
+}
+
+probe process("/usr/libexec/qemu-kvm").function("rbd_finish_bh")
+{
+  printf("%d,<-- %s %s\n", gettimeofday_ns(), ppfunc(), $$parms)
+}
+
+probe process("/usr/libexec/qemu-kvm").function("rbd_start_aio")
+{
+  t = gettimeofday_ns()
+  printf("%d,<-- %s %s\n", gettimeofday_ns(), ppfunc(), $$parms)
+  delta_time = t - begin_time
+  times[pid(), "rbd_aio_begin_run"] += delta_time
+  times[pid(), "rbd_aio_count"]++
+  started = 1
+}
+
+probe process("/usr/libexec/qemu-kvm").function("rbd_finish_aiocb")
+{
+
+  if (started != 1) {
+    next
+  }
+  printf("%d,<-- %s params: %s\n", gettimeofday_ns(), ppfunc(), $$parms)
+  t = gettimeofday_ns()
+  delta_time = t - begin_time
+  times[pid(), "rbd_aio_end_run"] += delta_time
+}
+
+probe process("/usr/libexec/qemu-kvm").function("bdrv_co_io_em_complete")
+{
+  if (started != 1) {
+    next
+  }
+  printf("%d,<-- %s params: %s\n", gettimeofday_ns(), ppfunc(), $$parms)
+  t = gettimeofday_ns()
+  delta_time = t - begin_time
+  times[pid(), "rbd_aio_bh_end"] += delta_time
+  times[pid(), "bh_count"]++
+}
+
+probe end
+{
+  foreach([p-,e] in times limit 10) {
+    printf("pid: %d\n", p)
+    printf("rbd_aio_spend_time: %d\n", times[p, "rbd_aio_end_run"] - times[p, "rbd_aio_begin_run"])
+    printf("bh_spend_time: %d\n", times[p, "rbd_aio_bh_end"] - times[p, "rbd_aio_end_run"])
+    printf("rbd_aio_count: %d bh_count: %d\n", times[p, "rbd_aio_count"], times[p, "bh_count"])
+  }
+}

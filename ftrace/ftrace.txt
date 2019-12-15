@@ -1,0 +1,11 @@
+ftrace
+------
+how to use ftrace
+
+== trace-cmd ==
+easily usaging:
+1. record events 
+trace-cmd record -p function_graph -e kvm -P 38161
+
+2. show reports
+trace-cmd report
