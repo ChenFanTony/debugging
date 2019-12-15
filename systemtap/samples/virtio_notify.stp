@@ -1,0 +1,32 @@
+global lbegin_time
+
+probe kernel.trace("kvm:kvm_fast_mmio") {
+  lbegin_time = gettimeofday_ns()
+  printf("time: %d kvm_fast_mmio -> %4d%s \n", lbegin_time, pid(), $$parms)
+}
+
+probe process("/usr/libexec/qemu-kvm").function("trace_virtio_blk_handle_write")
+{
+  lendtime = gettimeofday_ns()
+  delta = lendtime - lbegin_time
+  printf("time: %d delta: %d %s -> %4d%s \n", lendtime, delta, ppfunc(), pid(), $$parms)
+}
+
+probe kernel.trace("kvm:kvm_msi_set_irq") {
+  irqsend_time = gettimeofday_ns()
+  delta = irqsend_time - lbegin_time
+  printf("time: %d delta: %d trace kvm_msi_set_irq -> %s \n", irqsend_time, delta, $$parms)
+}
+
+probe kernel.trace("kvm:kvm_vcpu_wakeup") {
+  irqsend_time = gettimeofday_ns()
+  delta = irqsend_time - lbegin_time
+  printf("time: %d delta: %d kvm_vcpu_wakeup -> %s \n", irqsend_time, delta, $$parms)
+}
+
+probe process("/usr/libexec/qemu-kvm").function("virtio_notify_irqfd")
+{
+  lendtime = gettimeofday_ns()
+  delta = lendtime - lbegin_time
+  printf("time: %d delta: %d %s -> %4d%s \n", lendtime, delta, ppfunc(), pid(), $$parms)
+}

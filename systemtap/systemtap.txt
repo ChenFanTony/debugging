@@ -25,6 +25,10 @@ Install kernel-debuginfo kernel-devel
    4. swtich to devtoolset envirement
    $ scl enable devtoolset-8 'bash'
 
+== how to use ==
+probe a process
+$ stap -ve -x `pidof process` file.stp > trace.log
+
 == basic syntax ==
 1. userspace usaging
 systemtap can use inline function to show something
@@ -42,4 +46,26 @@ $ stap -ve 'probe process("/usr/libexec/qemu-kvm").function("worker_thread") {pr
 $ stap -ve 'probe process("/usr/libexec/qemu-kvm").function("worker_thread").return {print("\n"),exit()}'
 5). print a userspace call trace in a stp file
 $ print_usyms(ubackstrace())
+6). print the value of an address
+$ user_string(address)/user_long/user_char/user_int
 
+2. kernel usaging
+1). search a kernel function
+$ stap -l 'kernel.function("*")'
+2). search an argment of function
+$ stap -L 'kernel.function("vfs_open")' 
+3). search an trace  
+$ stap -l 'kernel.trace("*")'
+4). probe the function and trace
+$ stap -e 'probe kernel.function/trace("vfs_open") {print XX}'
+5) search if have a statement of file
+$ stap -l "probe kernel.statement("*@arch/x86/kernel/kvm.c:*")
+6). probe a statement
+$ stap -e 'probe kernel.statement("*@virt/kvm/kvm_main.c:2085") {print XX}'
+7). print stacktrace
+$ print_backtrace()
+
+
+== reference ==
+[1] https://sourceware.org/systemtap/langref/
+[2] https://sourceware.org/systemtap/tutorial/ 
