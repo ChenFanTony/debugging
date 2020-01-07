@@ -35,6 +35,7 @@ systemtap can use inline function to show something
   1. $$parms  <= the argments of a probe function
   2. $$locals <= the local values
   3. $returns <= the return values for function.return
+we can use a suffix "$" to print structure, use suffix "$$" to print nested structure.
 
 1). search a process function
 $ stap -l 'process("/usr/libexec/qemu-kvm").function("*")'
@@ -59,12 +60,16 @@ $ stap -l 'kernel.trace("*")'
 4). probe the function and trace
 $ stap -e 'probe kernel.function/trace("vfs_open") {print XX}'
 5) search if have a statement of file
-$ stap -l "probe kernel.statement("*@arch/x86/kernel/kvm.c:*")
+$ stap -l 'probe kernel.statement("*@arch/x86/kernel/kvm.c:*")'
 6). probe a statement
 $ stap -e 'probe kernel.statement("*@virt/kvm/kvm_main.c:2085") {print XX}'
 7). print stacktrace
 $ print_backtrace()
 
+== advance syntax ==
+1. tapset
+1) for qemu we can simply use qemu simpletrace like:
+stap -ve "qemu.kvm.simpletrace.paio_submit_co,qemu.kvm.simpletrace.virtio_blk_handle_write{}"
 
 == reference ==
 [0] https://sourceware.org/systemtap/documentation.html

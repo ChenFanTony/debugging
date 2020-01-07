@@ -1,6 +1,6 @@
 ftrace
 ------
-how to use ftrace
+how to use ftrace to see the trace-cmd man page
 
 == trace-cmd ==
 easily usaging:

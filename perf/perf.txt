@@ -1,0 +1,7 @@
+perf
+-----
+
+== perf usaging ==
+Q: how to probe a new function?
+
+A: using perf probe to add a new event probe point.
