@@ -173,7 +173,7 @@ mknod null c 1 3
   -initrd kernel/debugging/samples/initramfs.cpio.gz \
 # using rdinit=/linuxrc only can be used in initramfs because of linuxrc call etc/init.d/rcS which pid is not 1,
 # using init=/init to switch root to boot cloud image
-  -append "rdinit=/linuxrc console=ttyS0 loglevel=8" \
+  -append "rdinit=/linuxrc console=ttyS0 loglevel=8 cloud-init=disabled" \
   -s -S -fsdev local,security_model=passthrough,id=fsdev0,path=./share \
   -device virtio-9p-pci,id=fs0,fsdev=fsdev0,mount_tag=hostshare \
   -drive file=/home/chenfan/images/CentOS-7-x86_64-GenericCloud-1907.qcow2,if=virtio \
