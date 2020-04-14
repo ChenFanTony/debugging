@@ -2,6 +2,17 @@ perf
 -----
 
 == perf usaging ==
+
+To get the spending time in functions of ovs process and it's call trace:
+$ perf record -p `pidof ovs-vswitchd` -g --call-graph dwarf sleep 60
+To get the report:
+$ perf report -n
+
+
 Q: how to probe a new function?
 
 A: using perf probe to add a new event probe point.
+
+Q: why see hexadecimal numbers for a function?
+
+A: needs symbol information (symbols).
