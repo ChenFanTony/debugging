@@ -171,6 +171,8 @@ mknod null c 1 3
   -initrd kernel/debugging/samples/initramfs.cpio.gz \
 # using rdinit=/linuxrc only can be used in initramfs because of linuxrc call etc/init.d/rcS which pid is not 1,
 # using init=/init to switch root to boot cloud image
+# we also can use systemd.mask to mask service to reduce the boot time systemd.mask=gssproxy.service
+# systemd.mask=systemd-networkd.service systemd.mask=systemd-networkd.socket
   -append "rdinit=/linuxrc console=ttyS0 loglevel=8 cloud-init=disabled nokaslr" \
   -s -S -fsdev local,security_model=passthrough,id=fsdev0,path=./share \
   -device virtio-9p-pci,id=fs0,fsdev=fsdev0,mount_tag=hostshare \

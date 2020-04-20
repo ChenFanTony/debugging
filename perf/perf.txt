@@ -8,6 +8,8 @@ $ perf record -p `pidof ovs-vswitchd` -g --call-graph dwarf sleep 60
 To get the report:
 $ perf report -n
 
+if freq is too high, indicate: overload cpu/io, using -F XX :
+$ perf record -F 99 
 
 Q: how to probe a new function?
 
@@ -16,3 +18,5 @@ A: using perf probe to add a new event probe point.
 Q: why see hexadecimal numbers for a function?
 
 A: needs symbol information (symbols).
+
+Ref: https://perf.wiki.kernel.org/index.php/Tutorial
