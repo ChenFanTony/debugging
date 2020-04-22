@@ -116,7 +116,7 @@ mknod null c 1 3
      make modules_prepare
      make -j4 M=drivers/virtio modules
      ## also can specify the config flag to compile
-     ## like: make CONFIG_BCACHE=m M=drivers/md/bcache modules
+     ## like: make -C /lib/modules/XX/build CONFIG_BCACHE=m M=`pwd`/drivers/md/bcache modules
      mkdir /tmp/staging
      make M=drivers/virtio INSTALL_MOD_PATH=/tmp/staging modules_install
 
