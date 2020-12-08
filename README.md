@@ -189,3 +189,29 @@ mknod null c 1 3
 
    kernel init order by default:
      /sbin/init, /etc/init, /bin/init, /bin/sh
+
+  3) configuration VM network
+   qemu add comand line: -nic tap,model=e1000
+  need to create file and add executable permission:
+```
+$ cat /etc/qemu-ifup 
+#!/bin/sh
+
+echo "Executing /etc/qemu-ifup"
+echo "Bringing up $1 for bridged mode..."
+sudo /usr/sbin/ip link set $1 up promisc on
+echo "Adding $1 to br0..."
+sudo /usr/sbin/brctl addif virbr0 $1
+sleep 2
+
+$ cat /etc/qemu-ifdown
+#!/bin/sh
+
+echo "Executing /etc/qemu-ifdown"
+sudo /usr/sbin/ip link set $1 down
+sudo /usr/sbin/brctl delif virbr0 $1
+sudo /usr/sbin/ip link delete dev $1
+
+
+```
+

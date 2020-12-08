@@ -1,0 +1,18 @@
+dynamic_debug
+-------------
+
+Dynamic debug is designed to allow you to dynamically enable/disable            
+kernel code to obtain additional kernel information.  Currently, if             
+``CONFIG_DYNAMIC_DEBUG`` is set, then all ``pr_debug()``/``dev_dbg()`` and      
+``print_hex_dump_debug()``/``print_hex_dump_bytes()`` calls can be dynamically  
+enabled per-callsite.
+
+usaging:
+1. list pr_debug modules
+cat <debugfs>/dynamic_debug/control
+
+2. enable pr_debug modules
+echo "module module_name +p" > <debugfs>/dynamic_debug/control               
+
+detail see:
+Documentation/admin-guide/dynamic-debug-howto.rst
