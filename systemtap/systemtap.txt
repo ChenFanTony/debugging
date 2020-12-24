@@ -50,6 +50,9 @@ $ stap -ve 'probe process("/usr/libexec/qemu-kvm").function("worker_thread").ret
 $ print_usyms(ubackstrace())
 6). print the value of an address
 $ user_string(address)/user_long/user_char/user_int
+7). probe a process statement
+$ stap -ve 'probe process("/usr/bin/ceph-osd").statement("_txc_state_proc@BlueStore.cc:8146") {printXX}'
+
 
 2. kernel usaging
 1). search a kernel function
@@ -66,6 +69,10 @@ $ stap -l 'probe kernel.statement("*@arch/x86/kernel/kvm.c:*")'
 $ stap -e 'probe module("kvm").statement("*@virt/kvm/kvm_main.c:2085") {print XX}'
 7). print stacktrace
 $ print_backtrace()
+
+NOTE:
+1. for kernel modules, need to use module keyword.
+2. for intree function, need to use kernel function.
 
 == advance syntax ==
 1. tapset

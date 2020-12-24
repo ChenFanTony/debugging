@@ -6,6 +6,8 @@ how to use ftrace to see the trace-cmd man page
 easily usaging:
 1. record events 
 trace-cmd record -p function_graph -e kvm -P 38161
+trace-cmd record -p function_graph -e kvm sleep 10
+
 
 2. show reports
 trace-cmd report
