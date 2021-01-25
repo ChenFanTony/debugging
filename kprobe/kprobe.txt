@@ -1,0 +1,85 @@
+Kprobe
+---
+
+Static vs. dynamic probing
+Because it requires recompilation of source code, printk insertion is a static
+probing method. There are many other static tracepoints at important locations
+in the kernel code that can be enabled or disabled dynamically. The Linux kernel 
+has a few frameworks that can help a developer probe either the kernel or user
+space application without recompiling the source code. Kprobe is one such dynamic 
+method of inserting probe points within kernel code, and uprobe does so within
+a user application.
+
+1.1 How Does a Kprobe Work?
+
+When a kprobe is registered, Kprobes makes a copy of the probed
+instruction and replaces the first byte(s) of the probed instruction
+with a breakpoint instruction (e.g., int3 on i386 and x86_64).
+
+When a CPU hits the breakpoint instruction, a trap occurs, the CPU's
+registers are saved, and control passes to Kprobes via the
+notifier_call_chain mechanism.  Kprobes executes the "pre_handler"
+associated with the kprobe, passing the handler the addresses of the
+kprobe struct and the saved registers.
+
+Next, Kprobes single-steps its copy of the probed instruction.
+(It would be simpler to single-step the actual instruction in place,
+but then Kprobes would have to temporarily remove the breakpoint
+instruction.  This would open a small time window when another CPU
+could sail right past the probepoint.)
+
+After the instruction is single-stepped, Kprobes executes the
+"post_handler," if any, that is associated with the kprobe.
+Execution then continues with the instruction following the probepoint.
+
+
+1.2 How Does a Kprobe/Uprobe Used?
+
+Uprobe:
+  gcc -o test test.c
+  objectdump -d test
+
+0000000000400620 <func_1>:
+  400620:       90000080        adrp    x0, 410000 <__FRAME_END__+0xf6f8>
+  400624:       912d4000        add     x0, x0, #0xb50
+  400628:       b9400000        ldr     w0, [x0]
+  40062c:       11000401        add     w1, w0, #0x1
+  400630:       90000080        adrp    x0, 410000 <__FRAME_END__+0xf6f8>
+  400634:       912d4000        add     x0, x0, #0xb50
+  400638:       b9000001        str     w1, [x0]
+  40063c:       d65f03c0        ret
+
+0000000000400640 <func_2>:
+  400640:       90000080        adrp    x0, 410000 <__FRAME_END__+0xf6f8>
+  400644:       912d5000        add     x0, x0, #0xb54
+  400648:       b9400000        ldr     w0, [x0]
+  40064c:       11000401        add     w1, w0, #0x1
+  400650:       90000080        adrp    x0, 410000 <__FRAME_END__+0xf6f8>
+  400654:       912d5000        add     x0, x0, #0xb54
+  400658:       b9000001        str     w1, [x0]
+  40065c:       d65f03c0        ret
+
+we want to insert a probe at offset 0x620 and 0x644. Execute the following commands:
+
+# echo 'p:func_2_entry test:0x620' > /sys/kernel/debug/tracing/uprobe_events
+# echo 'p:func_1_entry test:0x644' >> /sys/kernel/debug/tracing/uprobe_events
+# echo 1 > /sys/kernel/debug/tracing/events/uprobes/enable
+# ./test&
+
+Kprobe:
+
+; disable all events, just to insure that we see only kprobe output in trace.
+# echo 0 > /sys/kernel/debug/tracing/events/enable
+; disable kprobe events until probe points are inserted.
+# echo 0 > /sys/kernel/debug/tracing/events/kprobes/enable
+; clear out all the events from kprobe_events, to ensure that we see output for
+; only those for which we have enabled
+# echo > /sys/kernel/debug/tracing/kprobe_events
+; insert probe point at kfree
+# echo "p kfree" >> /sys/kernel/debug/tracing/kprobe_events
+; insert probe point at kfree+0x10 with name kfree_probe_10
+# echo "p:kree_probe_10 kfree+0x10" >> /sys/kernel/debug/tracing/kprobe_events
+; insert probe point at kfree return
+# echo "r:kfree_probe kfree" >> /sys/kernel/debug/tracing/kprobe_events
+; enable kprobe events until probe points are inserted.
+# echo 1 > /sys/kernel/debug/tracing/events/kprobes/enable
