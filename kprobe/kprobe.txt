@@ -83,3 +83,9 @@ Kprobe:
 # echo "r:kfree_probe kfree" >> /sys/kernel/debug/tracing/kprobe_events
 ; enable kprobe events until probe points are inserted.
 # echo 1 > /sys/kernel/debug/tracing/events/kprobes/enable
+; define a new myprobe name, return register value
+# echo 'p:myprobe do_sys_open dfd=%ax filename=%dx flags=%cx mode=+4($stack)' > /sys/kernel/debug/tracing/kprobe_events
+; get a return value
+# echo 'r:myretprobe do_sys_open $retval' >> /sys/kernel/debug/tracing/kprobe_events
+; cat all the trace point
+# cat /sys/kernel/debug/tracing/kprobe_events
