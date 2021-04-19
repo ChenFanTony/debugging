@@ -8,6 +8,8 @@ easily usaging:
 trace-cmd record -p function_graph -e kvm -P 38161
 trace-cmd record -p function_graph -e kvm sleep 10
 
+1.1 record function graph
+trace-cmd record -p function_graph -g try_write sleep 10
 
 2. show reports
 trace-cmd report
