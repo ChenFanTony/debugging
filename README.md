@@ -145,8 +145,7 @@ mknod null c 1 3
      CONFIG_NET_9P_DEBUG=y (Optional)
 
    3) qemu boot args:
-     -fsdev local,security_model=passthrough,id=fsdev0,path=/tmp/share -device virtio-9p-pci,id=fs0,fsdev=fsdev0,mount_tag=hostshare /
-     -fsdev local,security_model=passthrough,id=fsdev0,path=/tmp/share,mount_tag=hostshare
+     -fsdev local,security_model=passthrough,id=fsdev0,path=/tmp/share -device virtio-9p-pci,id=fs0,fsdev=fsdev0,mount_tag=hostshare
 
    4) now we can copy modules to /tmp/share and in guest mount the share directorys
      mount -t 9p -o trans=virtio,version=9p2000.L hostshare /tmp/host_files
