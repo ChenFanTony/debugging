@@ -87,9 +87,20 @@ Kprobe:
 # echo 'p:myprobe do_sys_open dfd=%ax filename=%dx flags=%cx mode=+4($stack)' > /sys/kernel/debug/tracing/kprobe_events
 ; get a return value
 # echo 'r:myretprobe do_sys_open $retval' >> /sys/kernel/debug/tracing/kprobe_events
+; remove a kprobe point
+# echo '-:myprobe' > /sys/kernel/debug/tracing/events/kprobe_events
 ; cat all the trace point
 # cat /sys/kernel/debug/tracing/kprobe_events
 
+for an example:
+
+# cd /sys/kernel/debug/tracing
+# echo 'p:myprobe do_sys_open' > kprobe_events
+# echo 'r:myretprobe do_sys_open $retval' > kprobe_events
+# echo 1 > tracing_on
+# echo 1 > events/kprobes/myprobe/enable
+# cat trace
+XXXXXXXXXXXXXXXXXXX
 
 2. insert a kprobe module
 
