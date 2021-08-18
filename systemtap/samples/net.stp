@@ -1,0 +1,47 @@
+%{
+#include <linux/skbuff.h>
+#include <net/tcp.h>
+%}
+
+
+probe module("libceph").function("ceph_tcp_sendpage")
+{
+    printf("ceph_tcp_sendpage: %d page %p offset %d size %d\n", pid(), $page, $offset, $size)
+}
+
+probe kernel.function("do_tcp_sendpages")
+{
+    printf("do_tcp_sendpages: %d sk %p page %p offset %d size %d\n", pid(), $sk, $page, $offset, $size)
+}
+
+probe kernel.function("tcp_write_xmit")
+{
+
+    printf("tcp_write_xmit: %d sk %p\n", pid(), $sk)
+}
+
+function get_n_frag:long (skb:long) %{
+    int n;
+    struct sk_buff *skb = (struct sk_buff *)STAP_ARG_skb;
+    n = skb_shinfo(skb)->nr_frags;
+    STAP_RETURN(n);
+%}
+
+function get_frag_page:string (skb:long, num:long) %{
+   struct sk_buff *skb = (struct sk_buff *)STAP_ARG_skb;
+   skb_frag_t *frag = &skb_shinfo(skb)->frags[STAP_ARG_num];
+   STAP_PRINTF("skb %p page %p offset %d size %d\n", skb, frag->page.p, frag->page_offset, frag->size);
+   // %p can't be printed in snprintf.
+   // snprintf(STAP_RETVALUE, MAXSTRINGLEN, "skb %p page %p offset %d size %d", (void*)&skb, frag->page.p, frag->page_offset, frag->size);
+%}
+
+probe kernel.function("__tcp_transmit_skb")
+{
+    n = get_n_frag($skb)
+    
+    printf("tcp_transmit_skb:begin nfrag %d %d skb %p\n",n, pid(), $skb)
+    for (i = 0; i < n; i++) {
+	get_frag_page($skb, i)
+    }
+    printf("tcp_transmit_skb:end %d\n", pid())
+}
