@@ -1,0 +1,37 @@
+#/usr/bin/env stap
+
+%{
+
+#include<linux/blk-mq.h>
+
+%}
+
+global host,channel,id,lun,time
+probe begin {
+    host = $1
+    channel = $2
+    id = $3
+    lun = $4
+    time = $5
+    printf("device of interest:[%d,%d:%d:%d],time=%d ms\n",host,channel,id,lun,time)
+}
+
+function get_cmd:long (bd:long) %{
+    struct blk_mq_queue_data *bd = (struct blk_mq_queue_data *) STAP_ARG_bd;
+    struct request *req = bd->rq;
+    struct scsi_cmnd *cmd = blk_mq_rq_to_pdu(req);
+    STAP_RETURN(cmd);
+%}
+
+
+probe kernel.function("scsi_queue_rq") {
+    tmp = get_cmd($bd)
+    dev = @cast(tmp, "struct scsi_cmnd")->device
+    devhost = dev->host->host_no
+    devchannel = dev->channel
+    devid = dev->id
+    devlun = dev->lun
+    if (devhost == host && devchannel == channel && devid == id && devlun == lun) {
+        mdelay($5)
+    }
+}
