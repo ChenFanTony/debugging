@@ -13,3 +13,69 @@ trace-cmd record -p function_graph -g try_write sleep 10
 
 2. show reports
 trace-cmd report
+
+== result formation ==
+# CPU# which cpu process running on
+# irq-off: if "d", mean irqs off, if ".", mean irqs on
+# need_resched:
+  "N": process set TIF_NEED_RESCHED and PREEMPT_NEED_RESCHED, means need_resched.
+  "n": process set TIF_NEED_RESCHED
+  "P": process set PREEMPT_NEED_RESCHED
+  ".": no resched
+# hardirq/softirq: 
+  "H": there is a hardirq in softirq
+  "h": hardirq occured
+  "s": softirq occured
+  ".": no irq
+# preempt-depth: preempt depth level
+
+== function tracer ==
+function tracer can record all functions running in system, if
+want to trace one process, can use set_ftrace_pid
+```
+# cd /sys/kernel/debug/tracing/
+# cat set_ftrace_pid
+no pid
+# echo 1234 > set_ftrace_pid
+# echo function/function_graph > current_tracer
+# cat trace
+
+== Dynamic tracer ==
+# cd /sys/kernel/debug/tracing/
+# cat available_filter_functions # get all supported tracer functions
+# echo sys_nanosleep hrtimer_interrupt > set_ftrace_filter
+# echo function/function_graph > current_tracer
+# echo 1 > tracing_on
+# usleep 1
+# echo 0 > tracing_on
+# cat trace
+
+== Events tracer ==
+there are two type of events, function and trace events point.
+# cat available_events | grep sched_stat // query supported event
+# echo sched:sched_start_runtine > set_event
+
+we also can set filter to trace event, we can define a pattern formation.
+# cat /sys/kernel/debug/tracing/events/sched/sched_start_runtine
+# cat format
+name: sched_start_runtine
+format:
+normal domain ... comm
+
+trace domain ... comm, pid, size
+
+# cd events/sched/sched_stat_runtime/
+# echo 'comm ~ "sh*"' > filter    // string using "==", "!=", "~"
+# echo 'pid == 725' > filter  // int using "==", "!=", ">="...
+
+== irqs tracer ==
+trace irqs
+```
+# cd /sys/kernel/debug/tracing/
+# echo 0 > options/function_tracer
+# echo irqsoff > current_tracer
+# echo 1 > tracing_on
+...
+# echo 0 > tracing_on
+# cat trace
+```
