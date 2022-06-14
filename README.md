@@ -64,19 +64,19 @@ mknod null c 1 3
   qemu-system-x86_64 --nographic -m 1024 -kernel linux/arch/x86_64/boot/bzImage -initrd initramfs.cpio.gz -append "rdinit=/linuxrc console=ttyS0 loglevel=8" -S -s
 ```
 ## 5. gdb
-    shoud enable python support:
-    1) manual by source:
-    git clone git://sourceware.org/git/binutils-gdb.git
-    then compiling it
+  shoud enable python support:
+  1) manual by source:
+  git clone git://sourceware.org/git/binutils-gdb.git
+  then compiling it
 ```
     mkdir BUILD
     cd BUILD
     ../configure --with-python (need install python2-devel gcc-c++)
     make -j8
 ```
-    2) by install:
-    install python-debuginfo
-    vim ~/.gdbinit
+  2) by install:
+  install python-debuginfo
+  vim ~/.gdbinit
 ```    
     #python gdb.COMPLETE_EXPRESSION = gdb.COMPLETE_SYMBOL
     #add-auto-load-safe-path /root/data/src/linux/scripts/gdb/vmlinux-gdb.py
@@ -85,11 +85,11 @@ mknod null c 1 3
     # wget https://scaron.info/files/gdbinit 
     add `source gdbinit` to ~/.gdbinit
 ```
-    cd linux && gdb --tui vmlinux
-    (gdb) target remote localhost:1234
-    (gdb) hb start_kernel
-    (gdb) c
-    (gdb) apropos lx (support lx add symbos .etc)
+  cd linux && gdb --tui vmlinux
+  (gdb) target remote localhost:1234
+  (gdb) hb start_kernel
+  (gdb) c
+  (gdb) apropos lx (support lx add symbos .etc)
 
 ## 6. support gdb python scripts
 
