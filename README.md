@@ -2,7 +2,10 @@ Summary
 ----------------------------
 ## 1. Using qemu debug Linux core
    references: https://consen.github.io/2018/01/17/debug-linux-kernel-with-qemu-and-gdb/
-## 2. Manual compiling a minimum filesystem busybox
+   images URLs(x86,ARM):
+     https://cloud.centos.org/centos/7/images/
+     https://cloud-images.ubuntu.com/
+## 2. Manual compiling a minimum filesystem busybox (x86)
     https://busybox.net/downloads/busybox-1.31.0.tar.bz2
    1) decompress it, we will observe that its hierarchy dir similar to kernel dir
 ```
@@ -47,22 +50,38 @@ cd dev
 mknod console c 5 1
 mknod null c 1 3
 ```
-## 3. compiling kernel
-  1) modify initramfs source = busybox_root / using initramfs cpio
-  2) Enable CONFIG_GDB_SCRIPTS , disable CONFIG_RANDOMIZE_BASE(KASLR)/or cmdline + nokaslr
-  3) save to .config
-  4) make bzImage
 
-  initramfs:
+  5) packing initramfs:
 ```
      cd sample/busybox_root/
      find . -print0 | cpio --null -ov --format=newc | gzip -9 > ../initramfs.cpio.gz
 ```
 
+## 3. compiling kernel
+for x86 make menuconfig(all distros):
+  1) enable CONFIG_DEBUG_INFO(DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT), CONFIG_GDB_SCRIPTS,
+     disable CONFIG_RANDOMIZE_BASE(KASLR)/or cmdline + nokaslr
+  2) save to .config
+  3) make bzImage (-jCPUNUM)
+
+cross-compile building arm in x86(Only Ubuntu supported):
+  1) apt-get install -y gcc-aarch64-linux-gnu libssl-dev build-essential git libncurses5-dev
+  2) export ARCH=arm64
+  3) export CROSS_COMPILE=aarch64_linux-gnu-
+  4) make defconfig
+  5) make Image (-jCPUNUM)
+
 ## 4. using qemu to debug
+for X86:
 ```
   qemu-system-x86_64 --nographic -m 1024 -kernel linux/arch/x86_64/boot/bzImage -initrd initramfs.cpio.gz -append "rdinit=/linuxrc console=ttyS0 loglevel=8" -S -s
 ```
+
+for ARM:
+```
+  qemu-system-aarch64 -nographic -full-screen -M virt -cpu cortex-a57 -m 4096 -smp 4 --bios QEMU_EFI.fd -kernel arm/Image -append "console=ttyAMA0 loglevel=8" -S -s
+```
+
 ## 5. gdb
   shoud enable python support:
   1) manual by source:
@@ -74,7 +93,7 @@ mknod null c 1 3
     ../configure --with-python (need install python2-devel gcc-c++)
     make -j8
 ```
-  2) by install:
+  2) install gdb:
   install python-debuginfo
   vim ~/.gdbinit
 ```    
@@ -85,11 +104,24 @@ mknod null c 1 3
     # wget https://scaron.info/files/gdbinit 
     add `source gdbinit` to ~/.gdbinit
 ```
+  3) debug:
   cd linux && gdb --tui vmlinux
+```
+   gdb --tui vmlinux
+  (gdb) target remote localhost:1234
+  (gdb) c
+  (gdb) apropos lx
+```
+  for cross compiling aarch64 on Ubuntu
+```
+  apt-get install gdb-multiarch
+   gdb-multiarch --tui vmlinux
+  (gdb) set architecture aarch64
   (gdb) target remote localhost:1234
   (gdb) hb start_kernel
   (gdb) c
   (gdb) apropos lx (support lx add symbos .etc)
+```
 
 ## 6. support gdb python scripts
 
@@ -131,7 +163,7 @@ mknod null c 1 3
      make modules 
      make INSTALL_MOD_PATH=/tmp/staging modules_install
 ```
-   3) we can easily copy the modules to initramfs
+   3) we can easily copy the module to initramfs
 ```
      cp -r /tmp/staging/* busybox_root/
 ```
@@ -139,7 +171,10 @@ mknod null c 1 3
 ## 8. add modules support for qemu + 9p
    1) Compile qemu with enable-virtfs:
 ```
+x86:
     ./configure --target-list=x86_64-softmmu --enable-virtfs
+arm:
+    ./configure --target-list=aarch64-softmmu --enable-virtfs
 ```
    2) kernel enable features:
 ```
@@ -178,7 +213,8 @@ mknod null c 1 3
 
 ##NOTES:
   1) the whole qemu comdline:
-```    
+```
+x86:
   ./qemu/x86_64-softmmu/qemu-system-x86_64 --nographic -m 1024 -smp 2 --enable-kvm \
   -kernel kernel/linux/arch/x86_64/boot/bzImage \
   -initrd kernel/debugging/samples/initramfs.cpio.gz \
@@ -191,6 +227,21 @@ mknod null c 1 3
   -device virtio-9p-pci,id=fs0,fsdev=fsdev0,mount_tag=hostshare \
   -drive file=/home/chenfan/images/CentOS-7-x86_64-GenericCloud-1907.qcow2,if=virtio \
   -cdrom kernel/debugging/cloud-init/cloud-init.iso
+
+arm:
+  # download bios bin or get a copy one in samples directory
+  wget --no-check-certificate https://releases.linaro.org/components/kernel/uefi-linaro/latest/release/qemu64/QEMU_EFI.fd
+
+  ./qemu/aarch64-softmmu/qemu-system-aarch64 -nographic -full-screen -M virt -cpu cortex-a57 -m 4096 -smp 4 --bios QEMU_EFI.fd \
+  -kernel arm/Image -s -S \
+  -append "root=/dev/vda2 console=ttyAMA0 loglevel=8 cloud-init=disabled nokaslr systemd.mask=systemd-networkd.service systemd.mask=systemd-networkd.socket systemd.mask=gssproxy.service" \
+  -chardev socket,id=charmonitor,path=/tmp/monitor.sock,server,nowait -mon chardev=charmonitor,id=monitor \
+  -fsdev local,security_model=passthrough,id=fsdev0,path=./share \
+  -device virtio-9p-pci,id=fs0,fsdev=fsdev0,mount_tag=hostshare \
+  -drive file=/home/chenfan/data/ssd/images/CentOS-7-aarch64-GenericCloud-2009.qcow2,if=none,id=drive_disk0 \
+  -device virtio-blk-pci,drive=drive_disk0,id=virtio-blk0,scsi=off \
+  -cdrom kernel/debugging/cloud-init/cloud-init.iso \
+  -nic tap,model=e1000,mac=52:54:00:12:34:56
 ```
 
   2) kernel init process
