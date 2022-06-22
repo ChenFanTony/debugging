@@ -1,0 +1,31 @@
+#!/bin/sh
+
+mkdir -p /proc
+mkdir -p /tmp
+mkdir -p /sys
+mkdir -p /mnt
+mkdir -p /dev
+mkdir -p /sysroot
+mkdir -p /lib
+mount -a
+mkdir -p /dev/pts
+mount -t devpts devpts /dev/pts
+echo /sbin/mdev > /proc/sys/kernel/hotplug
+mdev -s
+
+mkdir -p /sharelib
+mount -t 9p -o trans=virtio,version=9p2000.L hostshare /sharelib/
+mount -o bind /sharelib/lib /lib
+
+modprobe libcrc32c
+modprobe isofs  
+modprobe virtio-blk
+modprobe libata
+modprobe ata_piix
+modprobe cdrom
+modprobe sr_mod
+modprobe xfs
+
+echo "The pid now is $$"
+#only useful for cloud image 
+mount -t xfs /dev/vda1 /sysroot

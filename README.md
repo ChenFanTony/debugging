@@ -5,10 +5,29 @@ Summary
    images URLs(x86,ARM):
      https://cloud.centos.org/centos/7/images/
      https://cloud-images.ubuntu.com/
-## 2. Manual compiling a minimum filesystem busybox (x86)
+### 1.1 cross_compile aarch64 on x86
+   1). download gcc-aarch64-linux-gnu
+```
+      wget --no-check-certificate https://releases.linaro.org/components/toolchain/binaries/latest-7/aarch64-linux-gnu/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu.tar.xz
+```
+   2). decompress it and copy to binary directory
+```
+      tar xvf X && cp -rf gcc-linaro-7.5.0-2019.12-X /usr/bin/
+```
+   3). add aarch64 path environment
+```
+      export PATH=$PATH:/usr/bin/toolchain/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu/bin/
+```
+   4). cross_compile
+```
+      make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- XXX
+```
+
+## 2. Manual compiling a minimum filesystem busybox
     https://busybox.net/downloads/busybox-1.31.0.tar.bz2
    1) decompress it, we will observe that its hierarchy dir similar to kernel dir
 ```
+      // aarch64 need specify ARCH and CORSS_COMPILE
       make menuconfig
       Configure Busybox according the following:
       Busybox Settings ---> Build Options ---> Build BusyBox as a static binary (no shared libs) ---> yes
@@ -18,7 +37,7 @@ Summary
 ```
    2) create dir
 
-       1) mkdir etc dev mnt
+       1) mkdir etc
        2) mkdir -p etc/init.d
        3) cd init.d
        4) vim rcS
@@ -50,15 +69,17 @@ cd dev
 mknod console c 5 1
 mknod null c 1 3
 ```
+  5) init
+refer to the init file
 
-  5) packing initramfs:
+  6) packing initramfs:
 ```
      cd sample/busybox_root/
      find . -print0 | cpio --null -ov --format=newc | gzip -9 > ../initramfs.cpio.gz
 ```
 
 ## 3. compiling kernel
-for x86 make menuconfig(all distros):
+make menuconfig(all distros):
   1) enable CONFIG_DEBUG_INFO(DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT), CONFIG_GDB_SCRIPTS,
      disable CONFIG_RANDOMIZE_BASE(KASLR)/or cmdline + nokaslr
   2) save to .config
@@ -232,9 +253,10 @@ arm:
   # download bios bin or get a copy one in samples directory
   wget --no-check-certificate https://releases.linaro.org/components/kernel/uefi-linaro/latest/release/qemu64/QEMU_EFI.fd
 
-  ./qemu/aarch64-softmmu/qemu-system-aarch64 -nographic -full-screen -M virt -cpu cortex-a57 -m 4096 -smp 4 --bios QEMU_EFI.fd \
-  -kernel arm/Image -s -S \
-  -append "root=/dev/vda2 console=ttyAMA0 loglevel=8 cloud-init=disabled nokaslr systemd.mask=systemd-networkd.service systemd.mask=systemd-networkd.socket systemd.mask=gssproxy.service" \
+  ./qemu/aarch64-softmmu/qemu-system-aarch64 -nographic -full-screen -M virt -cpu cortex-a57 -m 4096 -smp 4 \
+  -kernel arm/Image \
+  -initrd kernel/debugging/samples/initramfs-arm.cpio.gz \
+  -append "console=ttyAMA0 loglevel=8 cloud-init=disabled nokaslr systemd.mask=systemd-networkd.service systemd.mask=systemd-networkd.socket systemd.mask=gssproxy.service" \
   -chardev socket,id=charmonitor,path=/tmp/monitor.sock,server,nowait -mon chardev=charmonitor,id=monitor \
   -fsdev local,security_model=passthrough,id=fsdev0,path=./share \
   -device virtio-9p-pci,id=fs0,fsdev=fsdev0,mount_tag=hostshare \
