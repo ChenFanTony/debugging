@@ -3,27 +3,77 @@ bpftrace
 how to use bpftrace
 
 == requirement ==
-1. kernel 4.9
+1. kernel 4.9 or above
 2. enable kernel configure:
-```
-CONFIG_BPF=y
-CONFIG_BPF_SYSCALL=y
-CONFIG_BPF_JIT=y
-CONFIG_HAVE_EBPF_JIT=y
-CONFIG_BPF_EVENTS=y
-CONFIG_FTRACE_SYSCALLS=y
-CONFIG_FUNCTION_TRACER=y
-CONFIG_HAVE_DYNAMIC_FTRACE=y
-CONFIG_DYNAMIC_FTRACE=y
-CONFIG_HAVE_KPROBES=y
-CONFIG_KPROBES=y
-CONFIG_KPROBE_EVENTS=y
-CONFIG_ARCH_SUPPORTS_UPROBES=y
-CONFIG_UPROBES=y
-CONFIG_UPROBE_EVENTS=y
-CONFIG_DEBUG_FS=y
-```
+  CONFIG_BPF=y
+  CONFIG_BPF_SYSCALL=y
+  CONFIG_BPF_JIT=y
+  CONFIG_HAVE_EBPF_JIT=y
+  CONFIG_BPF_EVENTS=y
+  CONFIG_FTRACE_SYSCALLS=y
+  CONFIG_FUNCTION_TRACER=y
+  CONFIG_HAVE_DYNAMIC_FTRACE=y
+  CONFIG_DYNAMIC_FTRACE=y
+  CONFIG_HAVE_KPROBES=y
+  CONFIG_KPROBES=y
+  CONFIG_KPROBE_EVENTS=y
+  CONFIG_ARCH_SUPPORTS_UPROBES=y
+  CONFIG_UPROBES=y
+  CONFIG_UPROBE_EVENTS=y
+  CONFIG_DEBUG_FS=y
+
 3. dnf install pbftrace
 
-== bcc ==
-bcc-tools
+== how to use ==
+bpftrace test.bt
+
+== base syntax ==
+
+1. buildin variable
+
+  pid - Process ID (kernel tgid)
+  tid - Thread ID (kernel pid)
+  uid - User ID
+  gid - Group ID
+  nsecs - Nanosecond timestamp
+  elapsed - Nanoseconds since bpftrace initialization
+  numaid - NUMA Node ID
+  cpu - Processor ID
+  comm - Process name
+  kstack - Kernel stack trace
+  ustack - User stack trace
+  arg0, arg1, ..., argN. - Arguments to the traced function; assumed to be 64 bits wide
+  sarg0, sarg1, ..., sargN. - Arguments to the traced function (for programs that store arguments on the stack); assumed to be 64 bits wide
+  retval - Return value from traced function
+  func - Name of the traced function
+  probe - Full name of the probe
+  curtask - Current task struct as a u64
+  rand - Random number as a u32
+  cgroup - Cgroup ID of the current process
+  cpid - Child pid(u32), only valid with the -c command flag
+  $1, $2, ..., $N, $#. - Positional parameters for the bpftrace program
+
+2. #include: bpftrace can read kernel headers, which are often installed
+on production systems
+
+    #!/usr/local/bin/bpftrace
+    #include <net/sock.h>
+    $sk = (struct sock *)@sk[tid];
+
+3. /.../: Filter can be added after probe name.
+
+  bpftrace -e 'kprobe:vfs_read /comm == "bash"/ {...}'
+
+
+details refers to https://github.com/iovisor/bpftrace/blob/master/docs/reference_guide.md
+
+== bpftrace tools ==
+  after bpftrace installation, there are several sample tools can be used to debug. under:
+  /usr/share/bpftrace/tools/, like: biostacks, biolatency, etc...
+
+== bcc-tools ==
+for beginners, the easiest way to use pbf is to use bcc-tools. which have many sample tools.
+
+=== installation ===
+1. dnf install bcc-tools
+2. find the tools under /usr/share/bcc/tools/, the tools are more functional than bpftrace.
