@@ -1,0 +1,20 @@
+common tools:
+1. calculate the offset of struct field X.
+  gdb vmlinux
+  (gdb) p &((struct file *)0)->f_path.dentry
+  $1 = (struct dentry **) 0x18 <irq_stack_union+24>
+  (gdb) p &((struct dentry *)0)->d_name.name
+  $2 = (const unsigned char **) 0x28 <irq_stack_union+40>
+  (gdb) p &((struct file *)0)->f_flags
+  $3 = (unsigned int *) 0x40 <irq_stack_union+64>
+
+Sample 1:
+tracing function ext4_file_open flags:
+echo "p ext4_file_open flag=+0x40(%si):u32 name=+0(+0x28(+0x18(%si))):string"
+    >> /sys/kernel/debug/tracing/kprobe_events
+***
+flag = u32, name = const unsigned char *
+add a '+0():string' is to get the value of the address of name.
+
+fio-4151  [002] .... 85647.025601: p_ext4_file_open_0: (ext4_file_open+0x0/0x1f0) flag=49218 name="test1"
+***

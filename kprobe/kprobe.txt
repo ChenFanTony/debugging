@@ -91,6 +91,8 @@ Kprobe:
 # echo '-:myprobe' > /sys/kernel/debug/tracing/events/kprobe_events
 ; cat all the trace point
 # cat /sys/kernel/debug/tracing/kprobe_events
+; set a trace options
+# echo stacktrace > trace_options
 
 for an example:
 
