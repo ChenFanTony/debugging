@@ -93,6 +93,10 @@ Kprobe:
 # cat /sys/kernel/debug/tracing/kprobe_events
 ; set a trace options
 # echo stacktrace > trace_options
+; show up the probe stats
+# cat /sys/kernel/debug/tracing/kprobe_profile
+; add a filter
+# echo 'NAME ~ "*test"' > /sys/kernel/debug/tracing/events/kprobes/FUNC/filter
 
 for an example:
 

@@ -12,6 +12,9 @@ Sample 1:
 tracing function ext4_file_open flags:
 echo "p ext4_file_open flag=+0x40(%si):u32 name=+0(+0x28(+0x18(%si))):string"
     >> /sys/kernel/debug/tracing/kprobe_events
+
+echo 'name ~ "*test"' > /sys/kernel/debug/tracing/events/kprobes/p_ext4_file_open_0/filter
+
 ***
 flag = u32, name = const unsigned char *
 add a '+0():string' is to get the value of the address of name.
