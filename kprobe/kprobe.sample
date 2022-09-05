@@ -21,3 +21,33 @@ add a '+0():string' is to get the value of the address of name.
 
 fio-4151  [002] .... 85647.025601: p_ext4_file_open_0: (ext4_file_open+0x0/0x1f0) flag=49218 name="test1"
 ***
+
+Sample 2:
+bcache btree trace:
+echo 0 > /sys/kernel/debug/tracing/events/kprobes/enable
+
+echo > /sys/kernel/debug/tracing/trace
+echo > /sys/kernel/debug/tracing/kprobe_events
+
+# echo stacktrace > /sys/kernel/debug/tracing/trace_options 
+
+echo "p bch_btree_insert btree_pages=+0x11a4(%di):u16 btree=+0xcea0(%di) btree_page_order=+0xc8(+0xcea0(%di)):u8 level=+0xba(+0xcea0(%di)):u8 bkey=+0(%si) len_top=+8(%si) len_keys=+0(%si)" >> /sys/kernel/debug/tracing/kprobe_events
+echo "p bch_btree_map_nodes_recurse btree=%di btree_nsets=+0xc9(%di):u8 btree_set0_size=+0xd8(%di):u16 btree_set1_size=+0x108(%di):u16 btree_set2_size=+0x138(%di):u16 btree_set3_size=+0x168(%di):u16 from=%dx" >> /sys/kernel/debug/tracing/kprobe_events
+echo "p btree_insert_fn btree=%si" >> /sys/kernel/debug/tracing/kprobe_events
+echo "p bch_btree_insert_node btree=%di level=+0xba(%di):u8 written_block=+0xb8(%di):u16 bkey=%dx" >> /sys/kernel/debug/tracing/kprobe_events
+echo "r insert_u64s_remaining size=%ax:u32" >> /sys/kernel/debug/tracing/kprobe_events
+echo "p btree_split btree=%di" >> /sys/kernel/debug/tracing/kprobe_events
+echo "p bch_btree_node_alloc level=%dx:u8 parent_tree=%cx" >> /sys/kernel/debug/tracing/kprobe_events
+echo "p bch_btree_insert_keys btree=%di bkey=+0(%dx)" >> /sys/kernel/debug/tracing/kprobe_events
+echo "p bch_bset_insert insert_bkey=%dx" >> /sys/kernel/debug/tracing/kprobe_events
+echo "p bch_btree_leaf_dirty btree=%di" >> /sys/kernel/debug/tracing/kprobe_events
+echo "p bch_btree_node_write btree=%di" >> /sys/kernel/debug/tracing/kprobe_events
+echo "p bch_btree_init_next btree=%di" >> /sys/kernel/debug/tracing/kprobe_events
+echo "p bch_btree_node_read_done btree=%di" >> /sys/kernel/debug/tracing/kprobe_events
+echo "p bch_btree_node_get bkey=%dx" >> /sys/kernel/debug/tracing/kprobe_events
+echo "r mca_find btree=%ax" >> /sys/kernel/debug/tracing/kprobe_events
+echo "p mca_alloc bkey=%dx level=%cx:u8" >> /sys/kernel/debug/tracing/kprobe_events
+echo "r mca_alloc btree=%ax" >> /sys/kernel/debug/tracing/kprobe_events
+
+echo 1 > /sys/kernel/debug/tracing/events/kprobes/enable
+
