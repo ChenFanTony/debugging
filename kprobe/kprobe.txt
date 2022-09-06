@@ -105,7 +105,7 @@ for an example:
 # echo 'r:myretprobe do_sys_open $retval' > kprobe_events
 # echo 1 > tracing_on
 # echo 1 > events/kprobes/myprobe/enable
-# cat trace
+# cat trace/trace_pipe
 XXXXXXXXXXXXXXXXXXX
 
 2. insert a kprobe module
