@@ -8,6 +8,18 @@ common tools:
   (gdb) p &((struct file *)0)->f_flags
   $3 = (unsigned int *) 0x40 <irq_stack_union+64>
 
+2. if function have been optimilize, we can use the addr to call, such as:
+  gdb vmlinux
+  (gdb) b dio_set_defer_completion
+  (gdb) info b
+  0xffffffff81282e1b in do_direct_IO at fs/direct-io.c:723
+  0xffffffff81285c9e in __blockdev_direct_IO fs/direct-io.c:1278
+  (gdb) disassmble /m 0xffffffff81285c9e
+  // we can speculate the %r12 is the register that save the dio pointer
+  0xffffffff81285c9e <+6302>:  cmpb   $0x0,0x44(%r12)
+
+echo "p 0xffffffff81285c9e dio=%r12" >> /sys/kernel/debug/tracing/kprobe_events
+
 Sample 1:
 tracing function ext4_file_open flags:
 echo "p ext4_file_open flag=+0x40(%si):u32 name=+0(+0x28(+0x18(%si))):string"
