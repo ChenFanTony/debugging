@@ -1,0 +1,35 @@
+Uprobe
+---
+Uprobe based trace events are similar to kprobe based trace events.
+To enable this feature, build your kernel with CONFIG_UPROBE_EVENTS=y.
+
+Similar to the kprobe-event tracer, this doesn't need to be activated via
+current_tracer. Instead of that, add probe points via
+/sys/kernel/debug/tracing/uprobe_events, and enable it via
+/sys/kernel/debug/tracing/events/uprobes/<EVENT>/enabled.
+
+Example
+---
+Following example shows how to dump the instruction pointer and %ax register
+at the probed text address. Probe zfree function in /bin/zsh:
+
+    # cd /sys/kernel/debug/tracing/
+    # cat /proc/`pgrep zsh`/maps | grep /bin/zsh | grep r-xp
+    00400000-0048a000 r-xp 00000000 08:03 130904 /bin/zsh
+    # objdump -T /bin/zsh | grep -w zfree
+    0000000000446420 g    DF .text  0000000000000012  Base        zfree
+
+  0x46420 is the offset of zfree in object /bin/zsh that is loaded at
+  0x00400000. Hence the command to uprobe would be:
+
+    # echo 'p:zfree_entry /bin/zsh:0x46420 %ip %ax' > uprobe_events
+
+  And the same for the uretprobe would be:
+
+    # echo 'r:zfree_exit /bin/zsh:0x46420 %ip %ax' >> uprobe_events
+
+
+Q&A
+---
+Q: separate debug symbol files when using uprobes?
+A: Recommanding to use gdb
