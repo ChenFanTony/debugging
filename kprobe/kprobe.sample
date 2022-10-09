@@ -18,7 +18,17 @@ common tools:
   // we can speculate the %r12 is the register that save the dio pointer
   0xffffffff81285c9e <+6302>:  cmpb   $0x0,0x44(%r12)
 
-echo "p 0xffffffff81285c9e dio=%r12" >> /sys/kernel/debug/tracing/kprobe_events
+  echo "p 0xffffffff81285c9e dio=%r12" >> /sys/kernel/debug/tracing/kprobe_events
+
+  NOTE: if the address is not equal to the address in /proc/kallsyms, it means
+  there was an offset when kernel loaded, need add the offset.
+  for vmlinux: get the "_text" based address in /proc/kallsyms, and use the relative
+  address of debugging "func" got from gdb. then can calculate the absolute address
+  in running kernel.
+
+  for modules: get the mod's base offset in /proc/modules, get the func offset using
+  "objdump -dS --adjust-vma=0xffffffffc0ac7000 scsi_transport_iscsi.ko" (uncompressd).
+  or addr2line -e scsi_transport_iscsi.ko 0x58f0 get the function name for the func.
 
 Sample 1:
 tracing function ext4_file_open flags:
