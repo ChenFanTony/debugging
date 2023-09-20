@@ -78,3 +78,23 @@ echo "r mca_alloc btree=%ax" >> /sys/kernel/debug/tracing/kprobe_events
 
 echo 1 > /sys/kernel/debug/tracing/events/kprobes/enable
 
+Sample 3:
+# trace bio
+echo 0 > /sys/kernel/debug/tracing/events/kprobes/enable
+
+echo > /sys/kernel/debug/tracing/trace
+echo > /sys/kernel/debug/tracing/kprobe_events
+
+# echo stacktrace > /sys/kernel/debug/tracing/trace_options
+
+# enable trace sysall
+echo 0 > /sys/kernel/debug/tracing/events/syscalls/enable
+echo 1 > /sys/kernel/debug/tracing/events/syscalls/sys_enter_io_submit/enable
+echo 1 > /sys/kernel/debug/tracing/events/syscalls/sys_exit_io_submit/enable
+
+echo "p io_submit_one" >> /sys/kernel/debug/tracing/kprobe_events
+
+echo "p submit_bio bio=%di bi_opf=+0x10(%di):u32 bi_size=+0x28(%di):u32" >> /sys/kernel/debug/tracing/kprobe_events
+
+echo 1 > /sys/kernel/debug/tracing/events/kprobes/enable
+
