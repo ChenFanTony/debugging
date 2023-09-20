@@ -53,6 +53,9 @@ echo > /sys/kernel/debug/tracing/kprobe_events
 
 # echo stacktrace > /sys/kernel/debug/tracing/trace_options 
 
+# trace syscalls
+# echo 1 > /sys/kernel/debug/tracing/events/syscalls/enable
+
 echo "p bch_btree_insert btree_pages=+0x11a4(%di):u16 btree=+0xcea0(%di) btree_page_order=+0xc8(+0xcea0(%di)):u8 level=+0xba(+0xcea0(%di)):u8 bkey=+0(%si) len_top=+8(%si) len_keys=+0(%si)" >> /sys/kernel/debug/tracing/kprobe_events
 echo "p bch_btree_map_nodes_recurse btree=%di btree_nsets=+0xc9(%di):u8 btree_set0_size=+0xd8(%di):u16 btree_set1_size=+0x108(%di):u16 btree_set2_size=+0x138(%di):u16 btree_set3_size=+0x168(%di):u16 from=%dx" >> /sys/kernel/debug/tracing/kprobe_events
 echo "p btree_insert_fn btree=%si" >> /sys/kernel/debug/tracing/kprobe_events
