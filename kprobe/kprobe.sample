@@ -94,6 +94,8 @@ echo 1 > /sys/kernel/debug/tracing/events/syscalls/sys_exit_io_submit/enable
 
 echo "p io_submit_one" >> /sys/kernel/debug/tracing/kprobe_events
 
+echo "p aio_write nbytes=+0x20(%si):u32" >> /sys/kernel/debug/tracing/kprobe_events
+
 echo "p submit_bio bio=%di bi_opf=+0x10(%di):u32 bi_size=+0x28(%di):u32" >> /sys/kernel/debug/tracing/kprobe_events
 
 echo 1 > /sys/kernel/debug/tracing/events/kprobes/enable
