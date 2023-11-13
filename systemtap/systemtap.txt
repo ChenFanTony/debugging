@@ -65,7 +65,7 @@ $ stap -l 'kernel.trace("*")'
 4). probe the function and trace
 $ stap -e 'probe kernel.function/trace("vfs_open") {print XX}'
 5) search if have a statement of file
-$ stap -l 'probe kernel.statement("*@arch/x86/kernel/kvm.c:*")'
+$ stap -l 'kernel.statement("*@arch/x86/kernel/kvm.c:*")'
 6). probe a statement
 $ stap -e 'probe module("kvm").statement("*@virt/kvm/kvm_main.c:2085") {print XX}'
 7). print stacktrace
