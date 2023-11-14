@@ -37,6 +37,7 @@ systemtap can use inline function to show something
   2. $$locals <= the local values
   3. $returns <= the return values for function.return
   4. @cast(bio, "bio")->bi_ops <= use the cast to convert a void point to a type
+     cast ulong to type: bio = &@cast(bio, "bio")
 we can use a suffix "$" to print structure, use suffix "$$" to print nested structure.
 
 1). search a process function
