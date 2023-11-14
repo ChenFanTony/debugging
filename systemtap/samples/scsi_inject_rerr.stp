@@ -1,0 +1,73 @@
+#/usr/bin/env stap
+%{
+#include<linux/blk-mq.h>                 
+#include<scsi/scsi_cmnd.h>                                                            
+#include<scsi/scsi_request.h>
+%}
+global dev_major, dev_minor, dev_block_sec
+probe begin {
+    dev_major = $1
+    dev_minor = $2
+    dev_block_sec = $3
+    printf("\nBEGIN\n")
+}
+
+probe end
+{
+      printf("\nEND\n")
+}
+
+function get_cmd:long (sreq:long) %{
+    struct request *req = (struct request *)STAP_ARG_sreq;
+    struct scsi_cmnd *cmd = blk_mq_rq_to_pdu(req);
+    STAP_RETURN(cmd);
+%}
+
+function set_sense_buf:long (cmd:long, result:long, sensekey:long, asc:long, ascq:long )
+%{
+        struct scsi_cmnd * scmd = (struct scsi_cmnd *)(long)STAP_ARG_cmd;
+        struct scsi_request sreq = scmd->req;
+
+        sreq.result = (int)(long)STAP_ARG_result;
+        scmd->sense_buffer[0] = 0x70; /* current, fixed format */
+        scmd->sense_buffer[2] = (unsigned char)(long)STAP_ARG_sensekey;
+        scmd->sense_buffer[7] = 0x13; /* length */
+        scmd->sense_buffer[12] = (unsigned char)(long)STAP_ARG_asc;
+        scmd->sense_buffer[13] = (unsigned char)(long)STAP_ARG_ascq;
+%}
+
+probe kernel.function("scsi_decide_disposition@drivers/scsi/scsi_error.c") {
+        scmd_direction = $scmd->sc_data_direction 
+       if($scmd->request->rq_disk != 0) {
+                major = $scmd->request->rq_disk->major
+                minor = $scmd->request->rq_disk->first_minor
+                block = $scmd->request->__sector
+                req_len = $scmd->request->__data_len
+        }
+       
+        /* read */
+        if (major == dev_major && minor == dev_minor && scmd_direction == 2 &&
+                (block <= dev_block_sec ) && (dev_block_sec < block + (req_len >> 9))) {
+               printf("scsi_decide_disposition : major=%d minor=%d scmd=%d \n",major, minor, $scmd)
+               /* create fake status and sense data */
+               set_sense_buf($scmd, 0x02, 0x03, 0x11, 0x04)
+        }
+}
+
+probe kernel.statement("scsi_queue_rq@drivers/scsi/scsi_lib.c:1760") {
+        tmp = get_cmd($req)
+        cmd = &@cast(tmp, "scsi_cmnd")
+        major = 0
+        minor = 0
+        if($req->rq_disk != 0) {
+                major = $req->rq_disk->major
+                minor = $req->rq_disk->first_minor
+        }
+
+        if(major == dev_major && minor == dev_minor) {
+                printf("SCSI_DISPATCH_CMD: major= %d minor= %d \n", major, minor)
+                printf("SCSI_DISPATCH_CMD: start sector= %d \n", $req->__sector)
+                printf("SCSI_DISPATCH_CMD: req bufflen= %d \n", $req->__data_len)
+                printf("SCSI_DISPATCH_CMD: [7]=%d [8]=%d \n", cmd->cmnd[7],cmd->cmnd[8])
+        }
+}
