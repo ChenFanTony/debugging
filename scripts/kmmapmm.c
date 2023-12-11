@@ -1,3 +1,10 @@
+/*
+ *
+ *  fd = open("/dev/mmapmm")
+ *  mmap(0, len, PROT_READ | PROT_WRITE, MAP_SHARED, fd, phy_addr & ~MAP_MASK);
+ *
+ * */
+
 #define MMAPMM_DEV_NAME "mmapmm"
 #define MMAPMM_DEV_MAJOR 255 
  
