@@ -35,9 +35,11 @@ $ stap -ve -x `pidof process` file.stp > trace.log
 systemtap can use inline function to show something
   1. $$parms  <= the argments of a probe function
   2. $$locals <= the local values
-  3. $returns <= the return values for function.return
+  3. $return <= the return values for function.return
   4. @cast(bio, "bio")->bi_ops <= use the cast to convert a void point to a type
      cast ulong to type: bio = &@cast(bio, "bio")
+  5. @defined($vma) <= check function if have the vma parms
+  6. inter parm: pp(), tid(), cpu(), target()== -x pid;
 we can use a suffix "$" to print structure, use suffix "$$" to print nested structure.
 
 1). search a process function
