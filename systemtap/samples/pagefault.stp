@@ -1,0 +1,57 @@
+function find_physical_addr:long (mm, addr) %{
+  pgd_t *pgd;
+  pte_t *pte;
+  pud_t *pud;
+  pmd_t *pmd;
+
+  long address = STAP_ARG_addr;
+
+  struct page* page = NULL;
+  struct mm_struct *mm = (struct mm_struct*)STAP_ARG_mm;
+  phys_addr_t phys_addr;
+
+  pgd = pgd_offset(mm, address);
+  if (pgd_none(*pgd) || pgd_bad(*pgd)) {
+    _stp_printf("bad pgd");
+    STAP_RETURN(0);
+  }
+
+  pud = pud_offset(pgd, address);
+  if (pud_none(*pud) || pud_bad(*pud)) {
+    _stp_printf("bad pud\n");
+    STAP_RETURN(0);
+  }
+
+  pmd = pmd_offset(pud, address);
+  if (pmd_none(*pmd) || pmd_bad(*pmd)) {
+    _stp_printf("bad pmd\n");
+    STAP_RETURN(0);
+  }
+
+  pte = pte_offset_map(pmd, address);
+  if (!pte) {
+    _stp_printf("bad pte\n");
+    STAP_RETURN(0);
+  }
+
+  phys_addr = (pte_pfn(*pte) << PAGE_SHIFT) | (address & ~PAGE_MASK);
+
+  STAP_RETURN(phys_addr);
+%}
+
+/*
+probe vm.pagefault {
+  printf("%s\n", $$parms)
+}
+*/
+
+probe vm.pagefault.return {
+  if (@defined($vma) && @defined($address)) {
+    pid = $vma->vm_mm->owner->pid
+    addr = $address & 0xaaafffffffff
+    if (pid == target() && addr == $address) {
+      phy = find_physical_addr($vma->vm_mm, $address)
+      printf("addr 0x%x physical address 0x%x flags 0x%x\n", $address, phy, $flags)
+    }
+  }
+}
