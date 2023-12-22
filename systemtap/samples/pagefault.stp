@@ -55,3 +55,19 @@ probe vm.pagefault.return {
     }
   }
 }
+
+probe kernel.function("unmap_page_range") {
+     if ($vma->vm_mm->exe_file && kernel_string($vma->vm_mm->exe_file->f_path->dentry->d_iname) == "ceph-osd" ) {
+        phy = find_physical_addr($mm, $start)
+        printf("current = %s, unmap addr 0x%x ~ 0x%x physical address 0x%x\n",
+                execname(), $start, $end, phy)
+        printf("kernel call trace:\n")
+        print_backtrace()
+        printf("user call trace:\n")
+        print_ubacktrace()
+        printf("\n")
+    }
+}
+
+
+

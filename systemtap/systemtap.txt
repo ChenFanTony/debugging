@@ -56,7 +56,8 @@ $ print_usyms(ubacktrace())
 $ user_string(address)/user_long/user_char/user_int
 7). probe a process statement
 $ stap -ve 'probe process("/usr/bin/ceph-osd").statement("_txc_state_proc@BlueStore.cc:8146") {printXX}'
-
+8). get function call args in return
+$ stap -ve 'probe process("/usr/libexec/ceph-osd").return {print("%d\n", @entry($size), exit() }'
 
 2. kernel usaging
 1). search a kernel function
