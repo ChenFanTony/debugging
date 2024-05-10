@@ -40,6 +40,7 @@ echo 'name ~ "*test"' > /sys/kernel/debug/tracing/events/kprobes/p_ext4_file_ope
 ***
 flag = u32, name = const unsigned char *
 add a '+0():string' is to get the value of the address of name.
+if this pointer is a char *, you may need a +0():string again.
 
 fio-4151  [002] .... 85647.025601: p_ext4_file_open_0: (ext4_file_open+0x0/0x1f0) flag=49218 name="test1"
 ***
@@ -99,4 +100,3 @@ echo "p aio_write nbytes=+0x20(%si):u32" >> /sys/kernel/debug/tracing/kprobe_eve
 echo "p submit_bio bio=%di bi_opf=+0x10(%di):u32 bi_size=+0x28(%di):u32" >> /sys/kernel/debug/tracing/kprobe_events
 
 echo 1 > /sys/kernel/debug/tracing/events/kprobes/enable
-
