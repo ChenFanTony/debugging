@@ -11,6 +11,9 @@ trace-cmd record -p function_graph -e kvm sleep 10
 1.1 record function graph
 trace-cmd record -p function_graph -g try_write sleep 10
 
+1.2 record function backtrace
+trace-cmd report -p function --func-stack -l try_write sleep 5
+
 2. show reports
 trace-cmd report
 
