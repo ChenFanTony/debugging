@@ -1,0 +1,7 @@
+ebpf
+====
+
+## 1. requirements
+  in general, we install bcc-tools by dnf install bcc-tools
+  for self-compiled linux, we can build bpftool individually.
+  $ cd linux; make tools/bpf

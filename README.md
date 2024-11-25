@@ -83,7 +83,9 @@ make menuconfig(all distros):
   1) enable CONFIG_DEBUG_INFO(DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT), CONFIG_GDB_SCRIPTS,
      disable CONFIG_RANDOMIZE_BASE(KASLR)/or cmdline + nokaslr
   2) save to .config
-  3) make bzImage (-jCPUNUM)
+  3) make bzImage (-jCPUNUM)/make vmlinux
+  4) for support ebpf, need to build tools/bpf (for support BPF, need CONFIG_DEBUG_INFO_BTF=y)
+     make tools/bpf
 
 cross-compile building arm in x86(Only Ubuntu supported):
   1) apt-get install -y gcc-aarch64-linux-gnu libssl-dev build-essential git libncurses5-dev
