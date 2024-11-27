@@ -82,6 +82,8 @@ refer to the init file
 make menuconfig(all distros):
   1) enable CONFIG_DEBUG_INFO(DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT), CONFIG_GDB_SCRIPTS,
      disable CONFIG_RANDOMIZE_BASE(KASLR)/or cmdline + nokaslr
+     for eBPF, enable CONFIG_BPF=y CONFIG_BPF_SYSCALL=y CONFIG_BPF_JIT=y CONFIG_HAVE_EBPF_JIT=y
+     CONFIG_BPF_EVENTS=y CONFIG_KPROBES=y CONFIG_UPROBES=y 
   2) save to .config
   3) make bzImage (-jCPUNUM)/make vmlinux
   4) for support ebpf, need to build tools/bpf (for support BPF, need CONFIG_DEBUG_INFO_BTF=y)
