@@ -14,6 +14,10 @@ ebpf
   there were some efficient tools to use libbpf, but need
   library about libbpf and libbpf-devel packages.
 
+  Refs:
+  1) operator instruction
+  https://github.com/iovisor/bpf-docs/blob/master/eBPF.md
+
 ## 2. build dependence
   for self-compiled linux, we can build bpftool individually.
   bpftool is tool for inspects and manages BPF programs and maps
@@ -26,11 +30,16 @@ ebpf
   CONFIG_BPF_EVENTS=y
   CONFIG_FTRACE=y
   CONFIG_FUNCTION_TRACER=y
-  CONFIG_HAVE_DYNAMIC_FTRACE=y  
+  CONFIG_HAVE_DYNAMIC_FTRACE=y
+  CONFIG_DEBUG_INFO_BTF=y
 
   for self-built kernel, we also need linux headers for bcc or libbpf,
   which is an archive of headers:
   CONFIG_IKHEADERS=y
+
+  BTF: btf is the base of CO-RE, which supply BPF program and Map debuginfo.
+  BTF relative to DWARF, which have smaller size, speed load performance.
+  use bpftool can generate a vmlinux.h file, which is the layout.
 
   2) build linux and bpf tools, which can generate bpftool
   $ cd linux; make tools/bpf
@@ -51,11 +60,21 @@ ebpf
     only need to install bpftrace by dnf install
 
   for libbpf:
-    libbpf is a C-based library containing a BPF loader that takes compiled BPF object files and prepares and loads them into the Linux kernel. libbpf takes the heavy lifting of loading, verifying, and attaching BPF programs to various kernel hooks, allowing BPF application developers to focus only on BPF program correctness and performance.
-    BPF skeleton is an alternative interface to libbpf APIs for working with BPF objects. Skeleton code abstract away generic libbpf APIs to significantly simplify code for manipulating BPF programs from user space. Skeleton code includes a bytecode representation of the BPF object file, simplifying the process of distributing your BPF code. With BPF bytecode embedded, there are no extra files to deploy along with your application binary.
-    Using the skeleton code is the recommended way to work with bpf programs. Keep in mind, BPF skeleton provides access to the underlying BPF object, so whatever was possible to do with generic libbpf APIs is still possible even when the BPF skeleton is used. It’s an additive convenience feature, with no syscalls, and no cumbersome code. 
+    libbpf is a C-based library containing a BPF loader that takes compiled BPF object files
+  and prepares and loads them into the Linux kernel. libbpf takes the heavy lifting of loading,
+  verifying, and attaching BPF programs to various kernel hooks, allowing BPF application
+  developers to focus only on BPF program correctness and performance.
+    BPF skeleton is an alternative interface to libbpf APIs for working with BPF objects. Skeleton
+  code abstract away generic libbpf APIs to significantly simplify code for manipulating BPF programs
+  from user space. Skeleton code includes a bytecode representation of the BPF object file, simplifying
+  the process of distributing your BPF code. With BPF bytecode embedded, there are no extra files
+  to deploy along with your application binary.
+    Using the skeleton code is the recommended way to work with bpf programs. Keep in mind, BPF skeleton
+  provides access to the underlying BPF object, so whatever was possible to do with generic libbpf APIs
+  is still possible even when the BPF skeleton is used. It’s an additive convenience feature, with no
+  syscalls, and no cumbersome code. 
 
-    need to install libbpf and libbpf-devel by dnf install, also
+    for installation: need to install libbpf and libbpf-devel by dnf install, also
   need to generate vmlinux.h then we can use linux symbols directly
   in bpf programs.
   if you have the linux source, we can generate the vmlinux.h by bpftool.
@@ -176,7 +195,56 @@ int bpf_prog(struct pt_regs *ctx)
     return 0;
 }
     ```
+    compile the bpf object file.
     $ clang -O2 -target bpf -c minimal.bpf.c -o minimal.bpf.o
+
+    we also can use 'bpftool gen skeleton' to generate a *.skel.h code,
+    which include bpf bytecode and functions.
+
+    (1) common head file
+
+#include "vmlinux.h"
+#include <bpf/bpf_helpers.h>
+#include <bpf/bpf_tracing.h>
+#include <bpf/bpf_core_read.h>
+
+    (2) define Map object and program type
+
+  struct {
+    __uint(type, BPF_MAP_TYPE_HASH);
+    __unit(max_entries, 10240);
+    __type(key, u32);
+    __type(value, struct my_value);
+  } my_hash_map SEC(".maps")
+
+    when need to manager data in Maps, we can use blow code to get loaded BCC or libbpf probes.
+
+  #ifdef __BCC__
+    struct event *data = heap.lookup(&zero);
+  #else
+    struct event *data = bpf_map_lookup_eleme(&help, &zero);
+  #endif
+
+  #ifdef __BCC__
+    my_hash_map.update(&id, my_val);
+  #else
+    bpf_map_update_elem(&my_hash_map, &id, &my_val, 0);
+  #endif
+
+  #ifdef __BCC__
+    events.perf_submit(args, data, data_len);
+  #else
+    bpf_perf_event_output(args, &events, BPF_F_CURRENT_CPU, data, data_len); // write to perf buffer
+  #endif
+
+  for CO-RE eBPF program, must use SEC() marco to define type, like:
+
+  SEC("ksyscall/execve")
+  in BPF_KPROBE_SYSCALL(kprobe_sys_execve, const char *pathname)
+
+  for ksyscall, we also can use bpf_program__attach_ksysall() to adhere to target kprobe function.
+  otherwise, if we want to access field use "->", in bpf, we must use bpf_probe_read_kernel() function
+  to get values.
 
     secondary, write C loader.c to load bpf prog:
     loader.c
@@ -245,7 +313,8 @@ cleanup:
     loader min.bpf.o
     cat /sys/kernel/debug/tracing/trace / trace_pipe
 
-   effcient tools:
+
+### effcient bpf tools:
    refs: https://eunomia.dev/en/tutorials/1-helloworld/#installing-the-necessary-software-and-tools
    get compiled tool file:
     loader file:
