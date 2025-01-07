@@ -43,6 +43,8 @@ add a '+0():string' is to get the value of the address of name.
 if this pointer is a char *, you may need a +0():string again.
 
 fio-4151  [002] .... 85647.025601: p_ext4_file_open_0: (ext4_file_open+0x0/0x1f0) flag=49218 name="test1"
+
+fetch regs is from (struct pt_regs), if we want to use other regs we can use stackN to get the entry
 ***
 
 Sample 2:
