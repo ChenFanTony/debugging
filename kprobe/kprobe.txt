@@ -68,6 +68,52 @@ we want to insert a probe at offset 0x620 and 0x644. Execute the following comma
 
 Kprobe:
 
+Synopsis of kprobe_events
+ p[:[GRP/][EVENT]] [MOD:]SYM[+offs]|MEMADDR [FETCHARGS]        : Set a probe
+ r[MAXACTIVE][:[GRP/][EVENT]] [MOD:]SYM[+0] [FETCHARGS]        : Set a return probe
+ p[:[GRP/][EVENT]] [MOD:]SYM[+0]%return [FETCHARGS]    : Set a return probe
+ -:[GRP/][EVENT]                                               : Clear a probe
+
+GRP            : Group name. If omitted, use "kprobes" for it.
+EVENT          : Event name. If omitted, the event name is generated
+                 based on SYM+offs or MEMADDR.
+MOD            : Module name which has given SYM.
+SYM[+offs]     : Symbol+offset where the probe is inserted.
+SYM%return     : Return address of the symbol
+MEMADDR        : Address where the probe is inserted.
+MAXACTIVE      : Maximum number of instances of the specified function that
+                 can be probed simultaneously, or 0 for the default value
+                 as defined in Documentation/trace/kprobes.rst section 1.3.1.
+
+FETCHARGS      : Arguments. Each probe can have up to 128 args.
+ %REG          : Fetch register REG
+ @ADDR         : Fetch memory at ADDR (ADDR should be in kernel)
+ @SYM[+|-offs] : Fetch memory at SYM +|- offs (SYM should be a data symbol)
+ $stackN       : Fetch Nth entry of stack (N >= 0)
+ $stack        : Fetch stack address.
+ $argN         : Fetch the Nth function argument. (N >= 1) (\*1)
+ $retval       : Fetch return value.(\*2)
+ $comm         : Fetch current task comm.
+ +|-[u]OFFS(FETCHARG) : Fetch memory at FETCHARG +|- OFFS address.(\*3)(\*4)
+ \IMM          : Store an immediate value to the argument.
+ NAME=FETCHARG : Set NAME as the argument name of FETCHARG.
+ FETCHARG:TYPE : Set TYPE as the type of FETCHARG. Currently, basic types
+                 (u8/u16/u32/u64/s8/s16/s32/s64), hexadecimal types
+                 (x8/x16/x32/x64), VFS layer common type(%pd/%pD), "char",
+                 "string", "ustring", "symbol", "symstr" and bitfield are
+                 supported.
+
+ (\*1) only for the probe on function entry (offs == 0). Note, this argument access
+       is best effort, because depending on the argument type, it may be passed on
+       the stack. But this only support the arguments via registers.
+ (\*2) only for return probe. Note that this is also best effort. Depending on the
+       return value type, it might be passed via a pair of registers. But this only
+       accesses one register.
+ (\*3) this is useful for fetching a field of data structures.
+ (\*4) "u" means user-space dereference. See :ref:`user_mem_access`.
+
+
+
 ; disable all events, just to insure that we see only kprobe output in trace.
 # echo 0 > /sys/kernel/debug/tracing/events/enable
 ; disable kprobe events until probe points are inserted.
