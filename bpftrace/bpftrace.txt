@@ -40,8 +40,8 @@ bpftrace test.bt
   numaid - NUMA Node ID
   cpu - Processor ID
   comm - Process name
-  kstack - Kernel stack trace
-  ustack - User stack trace
+  kstack - Kernel stack trace: print(kstack)
+  ustack - User stack trace: print(ustack)
   args - Arguments to the list of kprobe or tracepoints, 
   arg0, arg1, ..., argN. - Arguments to the traced function; assumed to be 64 bits wide, for kprobe not for tracepoint
   sarg0, sarg1, ..., sargN. - Arguments to the traced function (for programs that store arguments on the stack); assumed to be 64 bits wide
@@ -65,8 +65,8 @@ bpftrace test.bt
   buf(void *p [, int length]) ：create buff
   strncmp(char s1, char s2, int length)：compare str
   sizeof(expression) 
-  ustack([limit]) ：
-  kstack([limit]) ：
+  ustack([limit]) :
+  kstack([limit]) :
   usym(void *p) ：convert addr to userspace program symbol
   uaddr(char *name) 
   ntop([int af,]int|char[4:16] addr) ：net addr tansfer
