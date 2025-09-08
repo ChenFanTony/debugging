@@ -42,9 +42,10 @@ bpftrace test.bt
   comm - Process name
   kstack - Kernel stack trace
   ustack - User stack trace
-  arg0, arg1, ..., argN. - Arguments to the traced function; assumed to be 64 bits wide
+  args - Arguments to the list of kprobe or tracepoints, 
+  arg0, arg1, ..., argN. - Arguments to the traced function; assumed to be 64 bits wide, for kprobe not for tracepoint
   sarg0, sarg1, ..., sargN. - Arguments to the traced function (for programs that store arguments on the stack); assumed to be 64 bits wide
-  retval - Return value from traced function
+  retval/args->ret - Return value from traced/kprobe function
   func - Name of the traced function
   probe - Full name of the probe
   curtask - Current task struct as a u64
@@ -52,6 +53,25 @@ bpftrace test.bt
   cgroup - Cgroup ID of the current process
   cpid - Child pid(u32), only valid with the -c command flag
   $1, $2, ..., $N, $#. - Positional parameters for the bpftrace program
+
+  buildin function
+  exit(); exit program
+  str(char *): convert
+  system(format[, arguments ...]): run shell script
+  join(char *str[]): print all args->arg
+  ksym(addr)：convert addr to kenrel symbol
+  kaddr(char *name): convert symbol to addr
+  print(@m [, top [, div]]): print map
+  buf(void *p [, int length]) ：create buff
+  strncmp(char s1, char s2, int length)：compare str
+  sizeof(expression) 
+  ustack([limit]) ：
+  kstack([limit]) ：
+  usym(void *p) ：convert addr to userspace program symbol
+  uaddr(char *name) 
+  ntop([int af,]int|char[4:16] addr) ：net addr tansfer
+  reg(char *name)：get register
+  cgroupid(char *path) 
 
 2. #include: bpftrace can read kernel headers, which are often installed
 on production systems
