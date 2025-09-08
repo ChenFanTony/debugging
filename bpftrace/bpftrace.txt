@@ -72,6 +72,7 @@ bpftrace test.bt
   ntop([int af,]int|char[4:16] addr) ：net addr tansfer
   reg(char *name)：get register
   cgroupid(char *path) 
+  strftime(format, nsecs): strftime("%H:%M:%S", nsecs)
 
 2. #include: bpftrace can read kernel headers, which are often installed
 on production systems
