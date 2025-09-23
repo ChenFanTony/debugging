@@ -1,0 +1,11 @@
+bcc tools
+===
+bcc-tools can be isntalled in verious distrutions. which are python format
+that encapsule libbpf.
+
+After dnf install bcc-tools, all tools can be found in folder:
+  /usr/share/bcc/tools/
+detail:
+  execsnoop: trace new process call exec() or process created.
+  biolatency: show disk latency as a histogram.
+

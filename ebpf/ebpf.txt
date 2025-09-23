@@ -49,11 +49,11 @@ ebpf
     bcc is one of the solutions for BPF portability. but it comes with runtime overhead
     and a large binary size from embedding the compiler with the application.
     and in compile time, it need lots of dependences.
-    need include linux header, so after comile IKHEADERS we had
-  a kernel/kheaders_data.tar.xz file under linux source code, we
-  need to decompress it to a path, usually we depcompress it to
-  '/lib/modules/$(uname -r)/build', if the path is not exsit, we
-  should create it. or set global enviroment:
+    need include linux header, so after compiled IKHEADERS we had
+    a kernel/kheaders_data.tar.xz file under linux source code, we
+    need to decompress it to a path, usually we depcompress it to
+    '/lib/modules/$(uname -r)/build', if the path is not exsit, we
+    should create it. or set global enviroment:
     BCC_KERNEL_SOURCE=/share/bpf-kernel-head/
 
   for bpftrace:
@@ -61,26 +61,26 @@ ebpf
 
   for libbpf:
     libbpf is a C-based library containing a BPF loader that takes compiled BPF object files
-  and prepares and loads them into the Linux kernel. libbpf takes the heavy lifting of loading,
-  verifying, and attaching BPF programs to various kernel hooks, allowing BPF application
-  developers to focus only on BPF program correctness and performance.
+    and prepares and loads them into the Linux kernel. libbpf takes the heavy lifting of loading,
+    verifying, and attaching BPF programs to various kernel hooks, allowing BPF application
+    developers to focus only on BPF program correctness and performance.
     BPF skeleton is an alternative interface to libbpf APIs for working with BPF objects. Skeleton
-  code abstract away generic libbpf APIs to significantly simplify code for manipulating BPF programs
-  from user space. Skeleton code includes a bytecode representation of the BPF object file, simplifying
-  the process of distributing your BPF code. With BPF bytecode embedded, there are no extra files
-  to deploy along with your application binary.
+    code abstract away generic libbpf APIs to significantly simplify code for manipulating BPF programs
+    from user space. Skeleton code includes a bytecode representation of the BPF object file, simplifying
+    the process of distributing your BPF code. With BPF bytecode embedded, there are no extra files
+    to deploy along with your application binary.
     Using the skeleton code is the recommended way to work with bpf programs. Keep in mind, BPF skeleton
-  provides access to the underlying BPF object, so whatever was possible to do with generic libbpf APIs
-  is still possible even when the BPF skeleton is used. It’s an additive convenience feature, with no
-  syscalls, and no cumbersome code. 
+    provides access to the underlying BPF object, so whatever was possible to do with generic libbpf APIs
+    is still possible even when the BPF skeleton is used. It’s an additive convenience feature, with no
+    syscalls, and no cumbersome code. 
 
     for installation: need to install libbpf and libbpf-devel by dnf install, also
-  need to generate vmlinux.h then we can use linux symbols directly
-  in bpf programs.
-  if you have the linux source, we can generate the vmlinux.h by bpftool.
-   ./tools/bpf/bpftool/bpftool btf dump file vmlinux format c > vmlinux.h
-  or using make tools/bpf which had generated the file located in
-   ./tools/bpf/bpftool/vmlinux.h.
+    need to generate vmlinux.h then we can use linux symbols directly
+    in bpf programs.
+    if you have the linux source, we can generate the vmlinux.h by bpftool.
+    ./tools/bpf/bpftool/bpftool btf dump file vmlinux format c > vmlinux.h
+    or using make tools/bpf which had generated the file located in
+    ./tools/bpf/bpftool/vmlinux.h
    it is much more effient than bcc, libbpf steps up the BPF program portability
    by supporting the BPF CO-RE(compile Onetime, run everywhere) concept.
    libbpf is precompiled, but in bcc which is runtime compiled.
