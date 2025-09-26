@@ -58,3 +58,6 @@ generating user-space backtraces without the need for frame pointers, accessing
 function arguments and local variables by name, and the ability to probe arbitrary
 statements. Both would seem to have their place for diagnosing problems in today's
 Linux systems.
+
+#### bpftool: examination program
+use bpftool can exam prog in BPF, which can also help to manager BPF map and object.

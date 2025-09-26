@@ -39,7 +39,12 @@ ebpf
 
   BTF: btf is the base of CO-RE, which supply BPF program and Map debuginfo.
   BTF relative to DWARF, which have smaller size, speed load performance.
-  use bpftool can generate a vmlinux.h file, which is the layout.
+  BTF include function and source code link information and data struction,
+  including BTF's BPF program wich is labeled with source code, then output
+  can be decoratored with more detail information.
+  so with BTF program is the self-description.
+
+  use bpftool can generate a vmlinux.h file, which is the program layout.
 
   2) build linux and bpf tools, which can generate bpftool
   $ cd linux; make tools/bpf
@@ -327,3 +332,30 @@ cleanup:
      ./ecli run package.json
 
     After running this program, you can view the output of the eBPF program by checking the /sys/kernel/debug/tracing/trace_pipe file.
+
+### BPF API
+1. bpf_map_lookup_elem(map, key): find value with key in maptable
+2. bpf_map_update_elem(map, key, value, flags): update value with key in maptable
+3. bpf_map_delete_elem(map, key): delete it
+4. bpf_probe_read(dst, size, src): read size from src and store into dst
+5. bpf_ktime_get_ns(): return ns from sys boot
+6. bpf_trace_printk()
+7. bpf_get_current_pid_tgid()
+8. bpf_get_current_comm(buf, buf_size)
+9. bpf_perf_event_output(ctx, map, data, size): write to perf_event ringbuffer, and output every event
+10. bpf_get_stackid/ bpf_get_current_task
+11. bpf_probe_read_str(dst, size, ptr): read size from an unsafe ptr and write to dst
+12. bpf_perf_event_read_value
+13. bpf_get_current_cgroup_id
+14. bpf_spin_lock/unlock
+
+### BPF syscall // can be caught by strace
+1. BPF_MAP_CREATE
+2. BPF_MAP_LOOKUP_ELEM
+3. BPF_MAP_UPDATE_ELEM
+4. BPF_MAP_DELETE_ELEM
+5. BPF_MAP_GET_NEXT_KEY
+6. BPF_PROG_LOAD
+7. BPF_PROG_ATTACH
+8. BPF_PROG_DETACH
+9. BPF_OBJ_PIN
