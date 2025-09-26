@@ -8,6 +8,9 @@ current_tracer. Instead of that, add probe points via
 /sys/kernel/debug/tracing/uprobe_events, and enable it via
 /sys/kernel/debug/tracing/events/uprobes/<EVENT>/enabled.
 
+relatively, user-level statically defined tracing (USDT) is used static
+tracepoints by defining DTRACE_PROBEn in code context (including dtrace.h)
+
 Example
 ---
 Following example shows how to dump the instruction pointer and %ax register
