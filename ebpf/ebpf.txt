@@ -3,7 +3,7 @@ ebpf
 
 ## 1. requirements
   in general, there are 3 approaches to use ebpf.
-  1) Using bcc python interface
+  1) Using bcc tools python interface
   we install bcc-tools by dnf to install bcc python libs,
   sometimes need to use pip3 install bcc to install the library.
   we also need to install kernel-headers which is used to
@@ -20,7 +20,7 @@ ebpf
 
 ## 2. build dependence
   for self-compiled linux, we can build bpftool individually.
-  bpftool is tool for inspects and manages BPF programs and maps
+  bpftool is tool for inspect and manage BPF programs and maps
   in the Linux kernel.
   1) build linux kernel
   CONFIG_BPF=y
@@ -33,7 +33,7 @@ ebpf
   CONFIG_HAVE_DYNAMIC_FTRACE=y
   CONFIG_DEBUG_INFO_BTF=y
 
-  for self-built kernel, we also need linux headers for bcc or libbpf,
+  for self-built kernel, we also need linux headers for bcc and libbpf,
   which is an archive of headers:
   CONFIG_IKHEADERS=y
 
@@ -91,7 +91,11 @@ ebpf
    libbpf is precompiled, but in bcc which is runtime compiled.
    refs: https://docs.kernel.org/bpf/libbpf/libbpf_overview.html
 
-## 3. usage
+## 3. principle:
+  All the tools are convenient to compile BPF source code to BPF programs, then
+  via BPF() syscall load into kernel, called by kernel context, like bpf_get_current_pid_tgid.
+
+## 4. usage
   1) bcc:
     refs: https://github.com/iovisor/bcc.git 
     python bcc_program.py
@@ -333,7 +337,7 @@ cleanup:
 
     After running this program, you can view the output of the eBPF program by checking the /sys/kernel/debug/tracing/trace_pipe file.
 
-### BPF API
+### BPF API (implement in kernel: kernel/bpf/helpers.c) 
 1. bpf_map_lookup_elem(map, key): find value with key in maptable
 2. bpf_map_update_elem(map, key, value, flags): update value with key in maptable
 3. bpf_map_delete_elem(map, key): delete it

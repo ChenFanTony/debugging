@@ -15,6 +15,7 @@ Bcc: biosnoop-bpfcc // require python, bcc, inplace compiling
 bpftrace: biosnoop.bt // require bcc, btf
 
 detail:
+  single functional:
   execsnoop: trace new process call exec() or process created.
   biolatency: show disk latency as a histogram.
   ext4slower/xfsslower: trace io slower than X ms
@@ -22,4 +23,8 @@ detail:
   tcpretans: trace each time tcp retansmission
   runqlat: trace run queue latency
   profile: sample at XX Hertz all hreads's stack
-
+  funccount/stackcount: trace XX function called times or show stack
+  multiply functional:
+  trace: support kprobes uprobe tracepoint and USDT, get the function args etc
+   can use -I include the struct header
+ 
