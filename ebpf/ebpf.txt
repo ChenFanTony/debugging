@@ -94,6 +94,7 @@ ebpf
 ## 3. principle:
   All the tools are convenient to compile BPF source code to BPF programs, then
   via BPF() syscall load into kernel, called by kernel context, like bpf_get_current_pid_tgid.
+  then writing result into map buffers, user poll the result.
 
 ## 4. usage
   1) bcc:

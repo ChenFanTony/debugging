@@ -88,6 +88,10 @@ on production systems
 
 details refers to https://github.com/iovisor/bpftrace/blob/master/docs/reference_guide.md
 
+== debug bpftrace program ==
+bpftrace -d / -dd: before run show compiled info
+bpftrace -v / -vv: at runtime show detail info
+
 == bpftrace tools ==
   after bpftrace installation, there are several sample tools can be used to debug. under:
   /usr/share/bpftrace/tools/, like: biostacks, biolatency, etc...
@@ -98,3 +102,7 @@ for beginners, the easiest way to use pbf is to use bcc-tools. which have many s
 === installation ===
 1. dnf install bcc-tools
 2. find the tools under /usr/share/bcc/tools/, the tools are more functional than bpftrace.
+
+=== trace sample ===
+1. trace usdt:
+  bpftrace -l usdt:/lib/x86_64-linux-gnu/libc-2.27.so // if libc enable usdt

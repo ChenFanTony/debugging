@@ -22,8 +22,15 @@ detail:
   tcpconnect: trace each time tcp connect
   tcpretans: trace each time tcp retansmission
   runqlat: trace run queue latency
+  runqlen/runqslower/cpufreq/cpudist
+  smpcalls: remote cpu calls
   profile: sample at XX Hertz all hreads's stack
   funccount/stackcount: trace XX function called times or show stack
+  offcputime: trace with stack when schedule
+  softirqs: functions sorted by spend time when do softirq
+  hardirqs: trace which net dev spend the most time
+  llcstat: cpu cache miss hit
+  memleak: trace memlink
   multiply functional:
   trace: support kprobes uprobe tracepoint and USDT, get the function args etc
    can use -I include the struct header
