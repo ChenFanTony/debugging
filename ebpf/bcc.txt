@@ -1,11 +1,25 @@
-bcc tools
+BCC(BPF Compiler Collection)
 ===
+bcc provides libbcc, libbpf liberary to support high level function
+bcc-tools use bcc to support python, C, etc.. to trace system profile.
+but bpftrace usually trace the kprobe to examine the issue.
 bcc-tools can be isntalled in verious distrutions. which are python format
 that encapsule libbpf.
 
+for rhel:
 After dnf install bcc-tools, all tools can be found in folder:
   /usr/share/bcc/tools/
+for ubuntu:
+After apt install bpfcc-tools, we can use bcc as:
+Bcc: biosnoop-bpfcc // require python, bcc, inplace compiling
+bpftrace: biosnoop.bt // require bcc, btf
+
 detail:
   execsnoop: trace new process call exec() or process created.
   biolatency: show disk latency as a histogram.
+  ext4slower/xfsslower: trace io slower than X ms
+  tcpconnect: trace each time tcp connect
+  tcpretans: trace each time tcp retansmission
+  runqlat: trace run queue latency
+  profile: sample at XX Hertz all hreads's stack
 
