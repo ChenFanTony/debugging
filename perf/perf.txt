@@ -8,8 +8,13 @@ $ perf record -p `pidof ovs-vswitchd` -g --call-graph dwarf sleep 60
 To get the report:
 $ perf report -n
 
+For kvm:
+perf kvm stat live
+
+pbf: kvmexits
+
 if freq is too high, indicate: overload cpu/io, using -F XX :
-$ perf record -F 99 
+$ perf record -F 99/49 
 
 Q: how to probe a new function?
 

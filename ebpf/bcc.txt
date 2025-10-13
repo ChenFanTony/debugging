@@ -8,7 +8,7 @@ that encapsule libbpf.
 
 for rhel:
 After dnf install bcc-tools, all tools can be found in folder:
-  /usr/share/bcc/tools/
+  /usr/share/bcc/tools/, bpftrace: /usr/share/bpftrace/tools/
 for ubuntu:
 After apt install bpfcc-tools, we can use bcc as:
 Bcc: biosnoop-bpfcc // require python, bcc, inplace compiling
@@ -17,7 +17,6 @@ bpftrace: biosnoop.bt // require bcc, btf
 detail:
   single functional:
   execsnoop: trace new process call exec() or process created.
-  biolatency: show disk latency as a histogram.
   ext4slower/xfsslower: trace io slower than X ms
   tcpconnect: trace each time tcp connect
   tcpretans: trace each time tcp retansmission
@@ -31,6 +30,15 @@ detail:
   hardirqs: trace which net dev spend the most time
   llcstat: cpu cache miss hit
   memleak: trace memlink
+  filesystem:
+  vfsstat: trace vfs read/write
+  xfsdist: xfs latency histgram
+  cachestat: get the ratio of cache hit
+  filetop: get the frequentest file access
+  I/O disk:
+  biolatency: show disk latency as a histogram.
+  biosnoop: catch all bios/requests include sector and size and latency
+  scsilatency: for scsi device
   multiply functional:
   trace: support kprobes uprobe tracepoint and USDT, get the function args etc
    can use -I include the struct header
