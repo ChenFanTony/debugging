@@ -106,3 +106,5 @@ for beginners, the easiest way to use pbf is to use bcc-tools. which have many s
 === trace sample ===
 1. trace usdt:
   bpftrace -l usdt:/lib/x86_64-linux-gnu/libc-2.27.so // if libc enable usdt
+2. user program
+  bpftrace -l 'uprobe:/bin/ceph-osd:*' // get all trace-able's stub

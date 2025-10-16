@@ -18,8 +18,6 @@ detail:
   single functional:
   execsnoop: trace new process call exec() or process created.
   ext4slower/xfsslower: trace io slower than X ms
-  tcpconnect: trace each time tcp connect
-  tcpretans: trace each time tcp retansmission
   runqlat: trace run queue latency
   runqlen/runqslower/cpufreq/cpudist
   smpcalls: remote cpu calls
@@ -29,7 +27,6 @@ detail:
   softirqs: functions sorted by spend time when do softirq
   hardirqs: trace which net dev spend the most time
   llcstat: cpu cache miss hit
-  memleak: trace memlink
   filesystem:
   vfsstat: trace vfs read/write
   xfsdist: xfs latency histgram
@@ -42,4 +39,22 @@ detail:
   multiply functional:
   trace: support kprobes uprobe tracepoint and USDT, get the function args etc
    can use -I include the struct header
- 
+  kernel:
+  kmem: show memory alloc times and size
+  kpages: trace alloc_pages and alloc size
+  memleak: trace memlink
+  User:
+   for userspace program, can use profile(8) to get uprobe point, and can use nm(1),
+   objdump(1) or readelf(1) to check if have symbols and debug pack. default,
+   kernel enable "CONFIG_FRAME_POINTER", so debug can easy get the backtrace.
+   but for user, frame pointer always be cleared. after complied use strip(1) clear all of them.
+   use "readelf -s bin" to get symbol ".symtab", which include all local symbol table.
+   ".dynsym" is link library symbol. strip(1) clear "symtab" section.
+   some C library, like libc include USDT(static trace point).
+  threadsnoop: trace libpthread: pthread_create
+  net:
+  tcplife: trace tcp connect lifespan
+  tcpdrop: trace tcp drop
+  tcpconnect: trace each time tcp connect
+  tcpretans: trace each time tcp retansmission
+
