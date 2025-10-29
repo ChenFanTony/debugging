@@ -21,7 +21,8 @@ detail:
   runqlat: trace run queue latency
   runqlen/runqslower/cpufreq/cpudist
   smpcalls: remote cpu calls
-  profile: sample at XX Hertz all hreads's stack
+  profile: sample at XX Hertz thread's stack and show consume function with
+    fireframe, like profile -p PID -d 5 -f out.xml
   funccount/stackcount: trace XX function called times or show stack
   offcputime: trace with stack when schedule
   softirqs: functions sorted by spend time when do softirq
